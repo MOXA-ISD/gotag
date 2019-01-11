@@ -1,6 +1,7 @@
 package gotag
 
 import (
+    "os"
 	"log"
 	"sync"
 	"time"
@@ -9,6 +10,13 @@ import (
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
+
+func getEnv(key, alter string) string {
+    if value, ok := os.LookupEnv(key); ok {
+        return value
+    }
+    return alter
+}
 
 func genId(n int) string {
     var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
@@ -126,26 +134,31 @@ func (self *TpMqtt)OnPublishHandler(client mqtt.Client, message mqtt.Message) {
 }
 
 func NewMqtt(cfg *MQConfig) (*TpMqtt, error) {
-	rand.Seed(time.Now().UnixNano())
-	t := &TpMqtt{
-			wg:		&sync.WaitGroup{},
-			ontag:	nil,
-		}
-
-    opts := mqtt.NewClientOptions()
-    opts.AddBroker("localhost:1883")
-    opts.SetClientID(genId(8))
-	opts.SetKeepAlive(3 * time.Second)
-    opts.SetCleanSession(true)
-	opts.SetOnConnectHandler(t.OnConnectHandler)
-	opts.SetConnectionLostHandler(t.OnDisconnectHandler)
-	opts.SetDefaultPublishHandler(t.OnPublishHandler)
-
-    t.c = mqtt.NewClient(opts)
-	if token := t.c.Connect(); token.Wait() && token.Error() != nil {
-		return nil, token.Error()
+    rand.Seed(time.Now().UnixNano())
+    t := &TpMqtt{
+            wg: &sync.WaitGroup{},
+            ontag: nil,
 	}
 
-	waitTimeout(t.wg, 3 * time.Second)
-	return t, nil
+    opts := mqtt.NewClientOptions()
+    if cfg.Host == "" {
+        opts.AddBroker("tcp://" + getEnv("APPMAN_TAGSERVICE_ADDR", "localhost") + ":" + cfg.Port)
+    } else {
+        opts.AddBroker("tcp://" + cfg.Host + ":" + cfg.Port)
+    }
+    opts.SetClientID(genId(8))
+    opts.SetKeepAlive(30 * time.Second)
+    opts.SetMaxReconnectInterval(3)
+    opts.SetCleanSession(true)
+    opts.SetOnConnectHandler(t.OnConnectHandler)
+    opts.SetConnectionLostHandler(t.OnDisconnectHandler)
+    opts.SetDefaultPublishHandler(t.OnPublishHandler)
+
+    t.c = mqtt.NewClient(opts)
+    if token := t.c.Connect(); token.Wait() && token.Error() != nil {
+        return nil, token.Error()
+    }
+
+    waitTimeout(t.wg, 3 * time.Second)
+    return t, nil
 }
