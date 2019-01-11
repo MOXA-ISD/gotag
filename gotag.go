@@ -11,8 +11,22 @@ type Tagf struct {
 	nums_of_topics	int32
 }
 
-func NewClient() *Tagf {
-	c, err := NewMqtt(nil)
+func getHost(host []string) string {
+    if len(host) > 0 {
+        return host[0]
+    }
+    return ""
+}
+
+func NewClient(host ...string) *Tagf {
+    config := &MQConfig{
+                Host: getHost(host),
+                Port: "1883",
+                Qos: 0,
+                Retained: false,
+             }
+
+	c, err := NewMqtt(config)
 	if c == nil  && err != nil {
         log.Printf("NewClient Err (%v)\n", err)
         return nil
