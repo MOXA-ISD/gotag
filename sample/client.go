@@ -6,7 +6,7 @@ import (
     "syscall"
     "os/signal"
 
-    t "github.com/MOXA-ISD/gotag"
+    t "github.com/CPtung/gotag"
 )
 
 func Exit() chan os.Signal {
@@ -34,9 +34,10 @@ func main() {
     }
 
     tag.SubscribeCallback(Handler)
-    tag.Subscribe("+", "+")
+    tag.Subscribe("electricity", "voltage")
 
     value := t.NewValue(1.414)
     tag.Publish("electricity", "voltage", value, t.TAG_VALUE_TYPE_DOUBLE, 1546920188000, "v")
+
     <-Exit()
 }
