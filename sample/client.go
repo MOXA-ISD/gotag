@@ -25,13 +25,13 @@ func Handler(source string, tag string, val *t.Value, valtype int32, ts uint64, 
 }
 
 func main() {
-    defer tag.Delete()
 
     tag := t.NewClient()
     if tag == nil {
         log.Println("No client")
         return
     }
+    defer tag.Delete()
 
     tag.SubscribeCallback(Handler)
     tag.Subscribe("electricity", "voltage")

@@ -5,7 +5,6 @@ import (
     "sync"
     "time"
     "errors"
-    "math/rand"
 
     mqtt "github.com/eclipse/paho.mqtt.golang"
 )
