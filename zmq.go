@@ -1,10 +1,15 @@
 package gotag
 
 import (
+    "time"
+    "sync"
+    "fmt"
     "errors"
 
     zmq "github.com/pebbe/zmq4"
 )
+
+const SIG_MXTAGF_STOP = "mxtagf/signal/stop/"
 
 type ZmqClient struct {
     publisher   *zmq.Socket
@@ -13,9 +18,11 @@ type ZmqClient struct {
 
 type TpZmq struct {
     MsgQueueBase
-    stop    bool
     c       *ZmqClient
+    isRun   bool
+    sigStop string
     ontag   OnTagCallback
+    wg      *sync.WaitGroup
 }
 
 func(self *TpZmq)Publish(topic string, payload []byte) error {
@@ -63,45 +70,41 @@ func(self *TpZmq)SubscribeCallback(hnd OnTagCallback) error {
 }
 
 func(self *TpZmq)Close() error {
-    self.stop = true
+    self.isRun = false
     if self.c != nil {
-        if self.c.subscriber != nil {
-            self.c.subscriber.Close()
+        self.wg.Add(1)
+        if _, err := self.c.publisher.Send(self.sigStop, 0); err != nil {
+            return err
         }
-        self.c.subscriber = nil
-        if self.c.publisher != nil {
-            self.c.publisher.Close()
-        }
-        self.c.publisher = nil
-        self.c = nil
+        self.wg.Wait()
     }
     return nil
 }
 
 func(self *TpZmq)onMessageReceived() {
-    for !self.stop {
+    defer self.c.subscriber.Close()
+    defer self.c.publisher.Close()
+    defer self.wg.Done()
+    for self.isRun {
         //  Read topic with address
         topic, terr := self.c.subscriber.Recv(0)
-        if terr != nil {
-            return
+        if terr != nil || topic == self.sigStop {
+            continue
         }
         //  Read message contents
         payload, perr := self.c.subscriber.RecvBytes(0)
         if perr != nil {
-            return
+            continue
         }
         //  Decode topic to get source and tag name
         srcName, tagName := DecodeTopic(topic)
         if srcName == "" || tagName == "" {
-            return
+            continue
         }
         //  Decode payload to tag
         tag := &Tag{}
         err := DecodePayload(payload, tag)
-        if err != nil {
-            return
-        }
-        if self.ontag != nil {
+        if err == nil && self.ontag != nil {
             self.ontag(tag.sourceName, tag.tagName, tag.val, tag.valType, tag.ts, tag.unit)
         }
         tag = nil
@@ -111,6 +114,8 @@ func(self *TpZmq)onMessageReceived() {
 func NewZmq() (*TpZmq, error) {
     var err error
     t := &TpZmq{
+        isRun: true,
+        wg: &sync.WaitGroup{},
         c: &ZmqClient{
             subscriber: nil,
             publisher:  nil,
@@ -135,5 +140,12 @@ func NewZmq() (*TpZmq, error) {
     }
     // start recv message thread
     go t.onMessageReceived()
+    time.Sleep(time.Millisecond)
+
+    // hook stop signal
+    t.sigStop = fmt.Sprintf("%v%v", SIG_MXTAGF_STOP, genId(8))
+    if err := t.c.subscriber.SetSubscribe(t.sigStop); err != nil {
+        return nil, err
+    }
     return t, nil
 }

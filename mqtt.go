@@ -100,7 +100,6 @@ func (self *TpMqtt)OnPublishHandler(client mqtt.Client, message mqtt.Message) {
 }
 
 func NewMqtt(cfg *MQConfig) (*TpMqtt, error) {
-    rand.Seed(time.Now().UnixNano())
     t := &TpMqtt{
             wg: &sync.WaitGroup{},
             ontag: nil,

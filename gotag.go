@@ -19,14 +19,7 @@ func getHost(host []string) string {
 }
 
 func NewClient(host ...string) *Tagf {
-    /*config := &MQConfig{
-                Host: getHost(host),
-                Port: "1883",
-                Qos: 0,
-                Retained: false,
-            }
-    */
-    c, err := NewZmq() //NewMqtt(config)
+    c, err := NewZmq()
     if c == nil  && err != nil {
         log.Printf("NewClient Err (%v)\n", err)
         return nil
@@ -78,5 +71,5 @@ func(self *Tagf) Delete() error {
     if !(self != nil && self.client != nil) {
         return errors.New("tag client not found")
     }
-    return errors.New("Tag client not found")
+    return self.client.Close()
 }

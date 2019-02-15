@@ -15,6 +15,7 @@ func getEnv(key, alter string) string {
 }
 
 func genId(n int) string {
+    rand.Seed(time.Now().UnixNano())
     var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
     b := make([]rune, n)
     for i := range b {
