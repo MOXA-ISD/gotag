@@ -118,11 +118,15 @@ func NewMqtt(cfg *MQConfig) (*TpMqtt, error) {
     opts.SetConnectionLostHandler(t.OnDisconnectHandler)
     opts.SetDefaultPublishHandler(t.OnPublishHandler)
 
+    wait := WaitSync(t.wg, 3)
+
     t.c = mqtt.NewClient(opts)
     if token := t.c.Connect(); token.Wait() && token.Error() != nil {
         return nil, token.Error()
     }
 
-    waitTimeout(t.wg, 3 * time.Second)
+    if !wait.PostDelay() {
+        return nil, errors.New("Wait mqtt connection timeout")
+    }
     return t, nil
 }

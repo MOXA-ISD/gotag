@@ -24,17 +24,34 @@ func genId(n int) string {
     return string(b)
 }
 
-func waitTimeout(wg *sync.WaitGroup, timeout time.Duration) bool {
+// ****************************************************************
+
+type WaitLock struct {
+    wg	        *sync.WaitGroup
+    timeout     time.Duration
+}
+
+func WaitSync(wg *sync.WaitGroup, timeout time.Duration) *WaitLock {
+    if wg == nil || timeout < 0 {
+        return nil
+    }
+    self := WaitLock{}
+    self.wg = wg
+    self.timeout = timeout
+    self.wg.Add(1)
+    return &self
+}
+
+func (w *WaitLock) PostDelay() bool {
     c := make(chan struct{})
     go func() {
-        wg.Add(1)
         defer close(c)
-        wg.Wait()
+        w.wg.Wait()
     }()
     select {
     case <-c:
-        return false
-    case <-time.After(timeout):
         return true
+    case <-time.After(w.timeout * time.Second):
+        return false
     }
 }
