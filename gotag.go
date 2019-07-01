@@ -6,8 +6,6 @@ import (
 
 type Tagf struct {
     client          MsgQueueBase
-    topics          []string
-    nums_of_topics  int32
 }
 
 func getHost(host []string) string {
@@ -32,8 +30,6 @@ func NewClient(host ...string) (*Tagf, error) {
 
     return &Tagf{
         client: c,
-        topics: []string{},
-        nums_of_topics: 0,
     }, nil
 }
 
@@ -62,7 +58,7 @@ func(self *Tagf) UnSubscribe(sourceName, tagName string) error {
         return errors.New("tag client not found")
     }
     topic := EncodeTopic(sourceName, tagName)
-    return self.client.Subscribe(topic)
+    return self.client.UnSubscribe(topic)
 }
 
 func(self *Tagf) SubscribeCallback(ontag OnTagCallback) error {

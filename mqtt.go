@@ -2,17 +2,19 @@ package gotag
 
 import (
     "log"
-    "sync"
     "time"
     "errors"
 
     mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
+func updateTopics(topics []string, topic string, action string) {
+}
+
 type TpMqtt struct {
     MsgQueueBase
     c       mqtt.Client
-    wg      *sync.WaitGroup
+    topics  []string
     ontag   OnTagCallback
 }
 
@@ -21,7 +23,9 @@ func(self *TpMqtt)Publish(topic string, payload []byte) error {
         return errors.New("tag client not found")
     }
     token := self.c.Publish(topic, 0, false, payload)
-    token.Wait()
+    if token.Wait() && token.Error() != nil {
+        return token.Error()
+    }
     return nil
 }
 
@@ -35,15 +39,29 @@ func(self *TpMqtt)Subscribe(topic string) error {
     if token := self.c.Subscribe(topic, 0, self.onMessageReceived); token.Wait() && token.Error() != nil {
         return token.Error()
     }
+    // add subscribed topic
+    for i := range self.topics {
+        if self.topics[i] == topic {
+            return nil
+        }
+    }
+    self.topics = append(self.topics, topic)
     return nil
 }
 
-func(self *TpMqtt)Unsubscribe(topic string) error {
+func(self *TpMqtt)UnSubscribe(topic string) error {
     if self.c == nil {
         return errors.New("tag client not found")
     }
     if token := self.c.Unsubscribe(topic); token.Wait() && token.Error() != nil {
         return token.Error()
+    }
+    // remove unsubscribed topic
+    for i := range self.topics {
+        if self.topics[i] == topic {
+            self.topics = append(self.topics[:i], self.topics[i+1:]...)
+            break
+        }
     }
     return nil
 }
@@ -82,11 +100,16 @@ func(self *TpMqtt)onMessageReceived(client mqtt.Client, message mqtt.Message) {
 }
 
 func (self *TpMqtt)OnConnectHandler(client mqtt.Client) {
-    self.wg.Done()
+    log.Printf("mqtt client connected")
+    for i := range self.topics {
+        if token := self.c.Subscribe(self.topics[i], 0, self.onMessageReceived); token.Wait() && token.Error() != nil {
+            log.Printf("re-subscribe topic (%v) error: %v", self.topics[i], token.Error())
+        }
+    }
 }
 
 func (self *TpMqtt)OnDisconnectHandler(client mqtt.Client, err error) {
-    log.Printf("client disconnected")
+    log.Printf("mqtt client disconnected")
     if err != nil {
         log.Printf(" error (%v)", err)
     }
@@ -100,7 +123,7 @@ func (self *TpMqtt)OnPublishHandler(client mqtt.Client, message mqtt.Message) {
 
 func NewMqtt(cfg *MQConfig) (*TpMqtt, error) {
     t := &TpMqtt{
-            wg: &sync.WaitGroup{},
+            topics: []string{},
             ontag: nil,
     }
 
@@ -118,15 +141,10 @@ func NewMqtt(cfg *MQConfig) (*TpMqtt, error) {
     opts.SetConnectionLostHandler(t.OnDisconnectHandler)
     opts.SetDefaultPublishHandler(t.OnPublishHandler)
 
-    wait := WaitSync(t.wg, 3)
-
     t.c = mqtt.NewClient(opts)
     if token := t.c.Connect(); token.Wait() && token.Error() != nil {
         return nil, token.Error()
     }
 
-    if !wait.PostDelay() {
-        return nil, errors.New("Wait mqtt connection timeout")
-    }
     return t, nil
 }
