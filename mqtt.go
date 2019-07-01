@@ -1,10 +1,10 @@
 package gotag
 
 import (
-    "log"
     "time"
     "errors"
 
+    logger "github.com/sirupsen/logrus"
     mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
@@ -87,38 +87,37 @@ func(self *TpMqtt)onMessageReceived(client mqtt.Client, message mqtt.Message) {
     }
     srcName, tagName := DecodeTopic(message.Topic())
     if srcName == "" || tagName == "" {
-        log.Println("wrong topic format")
+        logger.Error("wrong topic format")
         return
     }
     t := &Tag{}
     err := DecodePayload(message.Payload(), t)
     if err != nil {
-        log.Printf("on message received error (%v)", err)
+        logger.Error("on message received error (%v)", err)
         return
     }
     self.ontag(t.sourceName, t.tagName, t.val, t.valType, t.ts, t.unit)
 }
 
 func (self *TpMqtt)OnConnectHandler(client mqtt.Client) {
-    log.Printf("mqtt client connected")
+    logger.Info("mqtt client connected")
     for i := range self.topics {
         if token := self.c.Subscribe(self.topics[i], 0, self.onMessageReceived); token.Wait() && token.Error() != nil {
-            log.Printf("re-subscribe topic (%v) error: %v", self.topics[i], token.Error())
+            logger.Warn("re-subscribe topic (%v) error: %v", self.topics[i], token.Error())
         }
     }
 }
 
 func (self *TpMqtt)OnDisconnectHandler(client mqtt.Client, err error) {
-    log.Printf("mqtt client disconnected")
+    logger.Info("mqtt client disconnected")
     if err != nil {
-        log.Printf(" error (%v)", err)
+        logger.Info("disconnect error (%v)", err)
     }
-    log.Printf("\n")
 }
 
 func (self *TpMqtt)OnPublishHandler(client mqtt.Client, message mqtt.Message) {
-    log.Printf("Topic: %v\n", message.Topic())
-    log.Printf("Msg: %v\n", message.Payload())
+    logger.Info("Publish topic: %v\n", message.Topic())
+    logger.Info("Publish msg: %v\n", message.Payload())
 }
 
 func NewMqtt(cfg *MQConfig) (*TpMqtt, error) {

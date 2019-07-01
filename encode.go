@@ -1,11 +1,11 @@
 package gotag
 
 import (
-    "log"
     "strings"
 
     "github.com/golang/protobuf/proto"
     "github.com/CPtung/gotag/protobuf"
+    logger "github.com/sirupsen/logrus"
 )
 
 func EncodeTopic(source, tag string) string {
@@ -48,7 +48,7 @@ func EncodePayload(source string, tag string, value *Value, valtype int32, at ui
         }
     data, err := proto.Marshal(p)
     if err != nil {
-        log.Printf("Marshal tag protobuf got error (%v)\n", err)
+        logger.Error("Marshal tag protobuf got error (%v)\n", err)
         return nil
     }
     return data
