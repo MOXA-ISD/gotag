@@ -6,26 +6,26 @@ import (
 )
 
 const (
-    ERR_SUCESS			= 0
-    ERR_FAILED			= 1
-    ERR_INVALID_INPUT	= 2
-    ERR_NULL_ACCESS		= 3
+    ERR_SUCESS          = 0
+    ERR_FAILED          = 1
+    ERR_INVALID_INPUT   = 2
+    ERR_NULL_ACCESS     = 3
 )
 
 const (
-    TAG_VALUE_TYPE_BOOLEAN		= 0
-    TAG_VALUE_TYPE_INT8			= 1
-    TAG_VALUE_TYPE_INT16		= 2
-    TAG_VALUE_TYPE_INT32		= 3
-    TAG_VALUE_TYPE_INT			= 4
-    TAG_VALUE_TYPE_UINT8		= 5
-    TAG_VALUE_TYPE_UINT16		= 6
-    TAG_VALUE_TYPE_UINT32		= 7
-    TAG_VALUE_TYPE_UINT			= 8
-    TAG_VALUE_TYPE_FLOAT		= 9
-    TAG_VALUE_TYPE_DOUBLE		= 10
-    TAG_VALUE_TYPE_STRING		= 11
-    TAG_VALUE_TYPE_BYTEARRAY	= 12
+    TAG_VALUE_TYPE_BOOLEAN      = 0
+    TAG_VALUE_TYPE_INT8         = 1
+    TAG_VALUE_TYPE_INT16        = 2
+    TAG_VALUE_TYPE_INT32        = 3
+    TAG_VALUE_TYPE_INT          = 4
+    TAG_VALUE_TYPE_UINT8        = 5
+    TAG_VALUE_TYPE_UINT16       = 6
+    TAG_VALUE_TYPE_UINT32       = 7
+    TAG_VALUE_TYPE_UINT         = 8
+    TAG_VALUE_TYPE_FLOAT        = 9
+    TAG_VALUE_TYPE_DOUBLE       = 10
+    TAG_VALUE_TYPE_STRING       = 11
+    TAG_VALUE_TYPE_BYTEARRAY    = 12
 )
 
 type Value struct {

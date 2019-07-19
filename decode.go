@@ -2,13 +2,13 @@ package gotag
 
 import (
     "fmt"
-    "log"
     "regexp"
     "errors"
     "strings"
 
     "github.com/golang/protobuf/proto"
     "github.com/CPtung/gotag/protobuf"
+    logger "github.com/sirupsen/logrus"
 )
 
 func Split(str string, symbol string) (string, string, error) {
@@ -31,23 +31,33 @@ func DecodeTopic(topic string) (string, string) {
 
 func getDecodeValue(v *mxtag_pb.Value, t int32) *Value{
     value := &Value{}
-    if v.IntValue != nil && t == TAG_VALUE_TYPE_BOOLEAN {
-        value.i = v.GetIntValue()
-    } else if v.IntValue != nil && t == TAG_VALUE_TYPE_INT {
-        value.i = v.GetIntValue()
-    } else if v.UintValue != nil && t == TAG_VALUE_TYPE_UINT {
-        value.u = v.GetUintValue()
-    } else if v.FloatValue != nil && t == TAG_VALUE_TYPE_FLOAT {
-        value.f = v.GetFloatValue()
-    } else if v.DoubleValue != nil && t == TAG_VALUE_TYPE_DOUBLE {
-        value.d = v.GetDoubleValue()
-    } else if v.StrValue != nil && t == TAG_VALUE_TYPE_STRING {
-        value.s = v.GetStrValue()
-    } else if t == TAG_VALUE_TYPE_BYTEARRAY {
-        value.b = v.GetBytesValue()
-    } else {
-        log.Printf("not support type (%v)\n", t)
-        return nil
+    switch (t) {
+        case TAG_VALUE_TYPE_BOOLEAN:
+            value.i = v.GetIntValue()
+            break
+        case TAG_VALUE_TYPE_INT, TAG_VALUE_TYPE_INT8,
+                 TAG_VALUE_TYPE_INT16, TAG_VALUE_TYPE_INT32:
+            value.i = v.GetIntValue()
+            break
+        case TAG_VALUE_TYPE_UINT, TAG_VALUE_TYPE_UINT8,
+                 TAG_VALUE_TYPE_UINT16, TAG_VALUE_TYPE_UINT32:
+            value.u = v.GetUintValue()
+            break
+        case TAG_VALUE_TYPE_FLOAT:
+            value.f = v.GetFloatValue()
+            break
+        case TAG_VALUE_TYPE_DOUBLE:
+            value.d = v.GetDoubleValue()
+            break
+        case TAG_VALUE_TYPE_STRING:
+            value.s = v.GetStrValue()
+            break
+        case TAG_VALUE_TYPE_BYTEARRAY:
+            value.b = v.GetBytesValue()
+            break
+        default:
+            logger.Debugf("decode invalid value type: %v", t)
+            break
     }
     return value
 }

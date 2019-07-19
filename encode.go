@@ -19,20 +19,30 @@ func EncodeTopic(source, tag string) string {
 
 func getEncodeValue(val *Value, valType int32) *mxtag_pb.Value {
     v := &mxtag_pb.Value{}
-    if valType == TAG_VALUE_TYPE_BOOLEAN {
-        v.IntValue = &val.i
-    } else if valType == TAG_VALUE_TYPE_INT {
-        v.IntValue = &val.i
-    } else if valType == TAG_VALUE_TYPE_UINT {
-        v.UintValue = &val.u
-    } else if valType == TAG_VALUE_TYPE_FLOAT {
-        v.FloatValue = &val.f
-    } else if valType == TAG_VALUE_TYPE_DOUBLE {
-        v.DoubleValue = &val.d
-    } else if valType == TAG_VALUE_TYPE_STRING {
-        v.StrValue = &val.s
-    } else if valType == TAG_VALUE_TYPE_BYTEARRAY {
-        v.BytesValue = val.b
+    switch (valType) {
+        case TAG_VALUE_TYPE_BOOLEAN:
+            v.IntValue = &val.i
+            break
+        case TAG_VALUE_TYPE_INT, TAG_VALUE_TYPE_INT8,
+                 TAG_VALUE_TYPE_INT16, TAG_VALUE_TYPE_INT32:
+            v.IntValue = &val.i
+            break
+        case TAG_VALUE_TYPE_UINT, TAG_VALUE_TYPE_UINT8,
+                 TAG_VALUE_TYPE_UINT16, TAG_VALUE_TYPE_UINT32:
+            v.UintValue = &val.u
+            break
+        case TAG_VALUE_TYPE_FLOAT:
+            v.FloatValue = &val.f
+            break
+        case TAG_VALUE_TYPE_DOUBLE:
+            v.DoubleValue = &val.d
+            break
+        case TAG_VALUE_TYPE_STRING:
+            v.StrValue = &val.s
+            break
+        case TAG_VALUE_TYPE_BYTEARRAY:
+            v.BytesValue = val.b
+            break
     }
     return v
 }
