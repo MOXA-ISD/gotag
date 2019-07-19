@@ -90,5 +90,5 @@ func(self *Tagf) Delete() error {
     if !(self != nil && self.client != nil) {
         return errors.New("tag client not found")
     }
-    return errors.New("Tag client not found")
+    return self.client.Close()
 }
