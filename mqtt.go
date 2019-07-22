@@ -93,7 +93,7 @@ func(self *TpMqtt)onMessageReceived(client mqtt.Client, message mqtt.Message) {
     t := &Tag{}
     err := DecodePayload(message.Payload(), t)
     if err != nil {
-        logger.Error("on message received error (%v)", err)
+        logger.Errorf("on message received error (%v)", err)
         return
     }
     self.ontag(t.sourceName, t.tagName, t.val, t.valType, t.ts, t.unit)
@@ -103,7 +103,7 @@ func (self *TpMqtt)OnConnectHandler(client mqtt.Client) {
     logger.Info("mqtt client connected")
     for i := range self.topics {
         if token := self.c.Subscribe(self.topics[i], 0, self.onMessageReceived); token.Wait() && token.Error() != nil {
-            logger.Warn("re-subscribe topic (%v) error: %v", self.topics[i], token.Error())
+            logger.Warnf("re-subscribe topic (%v) error: %v", self.topics[i], token.Error())
         }
     }
 }
@@ -111,13 +111,13 @@ func (self *TpMqtt)OnConnectHandler(client mqtt.Client) {
 func (self *TpMqtt)OnDisconnectHandler(client mqtt.Client, err error) {
     logger.Info("mqtt client disconnected")
     if err != nil {
-        logger.Info("disconnect error (%v)", err)
+        logger.Infof("disconnect error (%v)", err)
     }
 }
 
 func (self *TpMqtt)OnPublishHandler(client mqtt.Client, message mqtt.Message) {
-    logger.Info("Publish topic: %v\n", message.Topic())
-    logger.Info("Publish msg: %v\n", message.Payload())
+    logger.Infof("Publish topic: %v\n", message.Topic())
+    logger.Infof("Publish msg: %v\n", message.Payload())
 }
 
 func NewMqtt(cfg *MQConfig) (*TpMqtt, error) {

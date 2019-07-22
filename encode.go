@@ -58,7 +58,7 @@ func EncodePayload(source string, tag string, value *Value, valtype int32, at ui
         }
     data, err := proto.Marshal(p)
     if err != nil {
-        logger.Error("Marshal tag protobuf got error (%v)\n", err)
+        logger.Errorf("Marshal tag protobuf got error (%v)\n", err.Error())
         return nil
     }
     return data
