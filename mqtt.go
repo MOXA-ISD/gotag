@@ -8,11 +8,9 @@ import (
     mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
-func updateTopics(topics []string, topic string, action string) {
-}
-
 type TpMqtt struct {
     MsgQueueBase
+    log     *logger.Logger
     c       mqtt.Client
     topics  []string
     ontag   OnTagCallback
@@ -87,45 +85,63 @@ func(self *TpMqtt)onMessageReceived(client mqtt.Client, message mqtt.Message) {
     }
     srcName, tagName := DecodeTopic(message.Topic())
     if srcName == "" || tagName == "" {
-        logger.Error("wrong topic format")
+        self.log.Error("wrong topic format")
         return
     }
     t := &Tag{}
     err := DecodePayload(message.Payload(), t)
     if err != nil {
-        logger.Errorf("on message received error (%v)", err)
+        self.log.Errorf("on message received error (%v)", err)
         return
     }
     self.ontag(t.sourceName, t.tagName, t.val, t.valType, t.ts, t.unit)
 }
 
 func (self *TpMqtt)OnConnectHandler(client mqtt.Client) {
-    logger.Info("mqtt client connected")
+    self.log.Info("mqtt client connected")
     for i := range self.topics {
         if token := self.c.Subscribe(self.topics[i], 0, self.onMessageReceived); token.Wait() && token.Error() != nil {
-            logger.Warnf("re-subscribe topic (%v) error: %v", self.topics[i], token.Error())
+            self.log.Warnf("re-subscribe topic (%v) error: %v", self.topics[i], token.Error())
         }
     }
 }
 
 func (self *TpMqtt)OnDisconnectHandler(client mqtt.Client, err error) {
-    logger.Info("mqtt client disconnected")
+    self.log.Info("mqtt client disconnected")
     if err != nil {
-        logger.Infof("disconnect error (%v)", err)
+        self.log.Infof("disconnect error (%v)", err)
     }
 }
 
 func (self *TpMqtt)OnPublishHandler(client mqtt.Client, message mqtt.Message) {
-    logger.Infof("Publish topic: %v\n", message.Topic())
-    logger.Infof("Publish msg: %v\n", message.Payload())
+    self.log.Infof("Publish topic: %v\n", message.Topic())
+    self.log.Infof("Publish msg: %v\n", message.Payload())
+}
+
+func (self *TpMqtt)SetLogLevel(level string) error {
+    if level == "info" {
+        self.log.SetLevel(logger.InfoLevel)
+    } else if level == "debug" {
+        self.log.SetLevel(logger.DebugLevel)
+    } else if level == "warn" {
+        self.log.SetLevel(logger.WarnLevel)
+    } else if level == "error" {
+        self.log.SetLevel(logger.ErrorLevel)
+    } else {
+        return errors.New("Level not defined")
+    }
+    return nil
 }
 
 func NewMqtt(cfg *MQConfig) (*TpMqtt, error) {
     t := &TpMqtt{
             topics: []string{},
-            ontag: nil,
+            ontag:  nil,
+	    log:    logger.New(),
     }
-
+    // set debug log level
+    t.SetLogLevel(cfg.Debug)
+    // init mqtt client
     opts := mqtt.NewClientOptions()
     if cfg.Host == "" {
         opts.AddBroker("tcp://" + getEnv("APPMAN_TAGSERVICE_ADDR", "localhost") + ":" + cfg.Port)
@@ -144,6 +160,7 @@ func NewMqtt(cfg *MQConfig) (*TpMqtt, error) {
     if token := t.c.Connect(); token.Wait() && token.Error() != nil {
         return nil, token.Error()
     }
+
 
     return t, nil
 }

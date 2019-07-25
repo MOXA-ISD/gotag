@@ -60,7 +60,6 @@ func main() {
         log.Println(err)
         return
     }
-    _tag.SetLogLevel("info")
     defer _tag.Delete()
 
     _tag.SubscribeCallback(Handler)

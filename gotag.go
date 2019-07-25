@@ -2,11 +2,10 @@ package gotag
 
 import (
     "errors"
-    logger "github.com/sirupsen/logrus"
 )
 
 type Tagf struct {
-    client          MsgQueueBase
+    client  MsgQueueBase
 }
 
 func getHost(host []string) string {
@@ -22,6 +21,7 @@ func NewClient(host ...string) (*Tagf, error) {
                 Port: "1883",
                 Qos: 0,
                 Retained: false,
+                Debug: "error",
              }
 
     c, err := NewMqtt(config)
@@ -29,26 +29,9 @@ func NewClient(host ...string) (*Tagf, error) {
         return nil, err
     }
 
-    logger.SetLevel(logger.ErrorLevel)
-
     return &Tagf{
         client: c,
     }, nil
-}
-
-func(self *Tagf) SetLogLevel(level string) error {
-    if level == "info" {
-        logger.SetLevel(logger.InfoLevel)
-    } else if level == "debug" {
-        logger.SetLevel(logger.DebugLevel)
-    } else if level == "warn" {
-        logger.SetLevel(logger.WarnLevel)
-    } else if level == "error" {
-        logger.SetLevel(logger.ErrorLevel)
-    } else {
-        return errors.New("Level not defined")
-    }
-    return nil
 }
 
 func(self *Tagf) Publish(sourceName string, tagName string, val *Value, valType int32, timestamp uint64, unit string) error {

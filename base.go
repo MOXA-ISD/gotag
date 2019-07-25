@@ -4,6 +4,7 @@ type MQConfig struct {
     Id          string
     Host        string
     Port        string
+    Debug       string
     Qos         byte
     Retained    bool
 }
