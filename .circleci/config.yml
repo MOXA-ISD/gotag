@@ -1,0 +1,28 @@
+# Golang CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-go/ for more details
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.12-stretch
+        environment:
+          GO111MODULE: "on"
+    working_directory: /go/src/github.com/CPtung/gotag
+    steps:
+      - restore_cache:
+          keys:
+            - go-mod-v1-{{ checksum "go.sum" }}
+      - checkout
+      - run:
+          name: Install System Dependencies
+          command: sudo apt-get update && sudo apt-get install mosquitto -y
+      - run:
+          name: Start Mosquitto Broker
+          command: sudo service mosquitto start
+      - run: go vet -printf=true -unreachable=true ./*.go
+      - run: go test -v --cover ./
+      - save_cache:
+          key: go-mod-v1-{{ checksum "go.sum" }}
+          paths:
+            - "/go/pkg/mod"
