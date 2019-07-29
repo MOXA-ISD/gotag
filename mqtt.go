@@ -83,18 +83,17 @@ func(self *TpMqtt)onMessageReceived(client mqtt.Client, message mqtt.Message) {
     if self.ontag == nil {
         return
     }
-    srcName, tagName := DecodeTopic(message.Topic())
-    if srcName == "" || tagName == "" {
-        self.log.Error("wrong topic format")
+    if _, _, err := DecodeTopic(message.Topic()); err != nil {
+        self.log.Errorf("%v: %v", err.Error(), message.Topic())
         return
     }
     t := &Tag{}
-    err := DecodePayload(message.Payload(), t)
-    if err != nil {
-        self.log.Errorf("on message received error (%v)", err)
+    if err := DecodePayload(message.Payload(), t); err != nil {
+        self.log.Errorf("on message received error (%v)", err.Error())
         return
     }
     self.ontag(t.sourceName, t.tagName, t.val, t.valType, t.ts, t.unit)
+    t = nil
 }
 
 func (self *TpMqtt)OnConnectHandler(client mqtt.Client) {
@@ -160,7 +159,5 @@ func NewMqtt(cfg *MQConfig) (*TpMqtt, error) {
     if token := t.c.Connect(); token.Wait() && token.Error() != nil {
         return nil, token.Error()
     }
-
-
     return t, nil
 }

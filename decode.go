@@ -4,29 +4,19 @@ import (
     "fmt"
     "regexp"
     "errors"
-    "strings"
 
     "github.com/golang/protobuf/proto"
     "github.com/CPtung/gotag/protobuf"
     logger "github.com/sirupsen/logrus"
 )
 
-func Split(str string, symbol string) (string, string, error) {
-    s := strings.Split(str, symbol)
-    if len(s) < 2 {
-        return str, "", errors.New("no matched")
+func DecodeTopic(topic string) (string, string, error) {
+    re := regexp.MustCompile("/(\\+|[\\w-]+)")
+    matches := re.FindAllStringSubmatch(topic, -1)
+    if matches != nil && len(matches) > 3 {
+        return matches[1][1], matches[3][1], nil
     }
-    return s[0], s[1], nil
-}
-
-func DecodeTopic(topic string) (string, string) {
-    re, _ := regexp.Compile("/equs/(.*)/tags(.*)")
-    str := re.ReplaceAllString(topic, "$1$2")
-    source, tag, err := Split(str, "/")
-    if err != nil {
-        return "", ""
-    }
-    return source, tag
+    return "", "", errors.New("invalid topic format")
 }
 
 func getDecodeValue(v *mxtag_pb.Value, t int32) *Value{
