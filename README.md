@@ -1,5 +1,4 @@
-gotag
-======
+# Gotag [![CircleCI](https://circleci.com/gh/CPtung/gotag/tree/master.svg?style=shield)](https://circleci.com/gh/CPtung/gotag/tree/master)
 
 GoTag is a Go pakcage for [ThingsPro](https://www.moxa.com/en/products/industrial-computing/system-software/thingspro-2). It integrates the mqtt client and the protobuffer which makes data exchanging become easily and narrow down the transmission bandwidth.
 
