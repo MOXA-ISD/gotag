@@ -1,4 +1,4 @@
-module github.com/CPtung/gotag
+module github.com/MOXA-ISD/gotag
 
 require (
 	github.com/eclipse/paho.mqtt.golang v1.1.1

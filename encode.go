@@ -4,7 +4,7 @@ import (
     "strings"
 
     "github.com/golang/protobuf/proto"
-    "github.com/CPtung/gotag/protobuf"
+    "github.com/MOXA-ISD/gotag/protobuf"
     logger "github.com/sirupsen/logrus"
 )
 
