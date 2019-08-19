@@ -8,7 +8,7 @@ jobs:
       - image: circleci/golang:1.12-stretch
         environment:
           GO111MODULE: "on"
-    working_directory: /go/src/github.com/CPtung/gotag
+    working_directory: /go/src/github.com/MOXA-ISD/gotag
     steps:
       - checkout
       - restore_cache:
@@ -34,3 +34,10 @@ jobs:
           key: go-pkg-cache
           paths:
             - "/go/pkg"
+
+
+workflows:
+  version: 2
+  build-Workflow:
+    jobs:
+      - build
