@@ -5,7 +5,7 @@ import (
     "testing"
     "github.com/stretchr/testify/assert"
 
-    gotag "github.com/CPtung/gotag"
+    gotag "github.com/MOXA-ISD/gotag"
 )
 
 var (
