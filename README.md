@@ -1,14 +1,14 @@
-# Gotag [![CircleCI](https://circleci.com/gh/CPtung/gotag/tree/master.svg?style=shield)](https://circleci.com/gh/CPtung/gotag/tree/master)
+# Gotag [![CircleCI](https://circleci.com/gh/MOXA-ISD/gotag/tree/develop.svg?style=svg&circle-token=a1943d94f137d6072569b4e97dfc24fae556d91e)](https://circleci.com/gh/MOXA-ISD/gotag/tree/develop)
 
-GoTag is a Go pakcage for [ThingsPro](https://www.moxa.com/en/products/industrial-computing/system-software/thingspro-2). It integrates the mqtt client and the protobuffer which makes data exchanging become easily and narrow down the transmission bandwidth.
+GoTag is a Go pakcage for [ThingsPro](https://www.moxa.com/en/products/industrial-computing/system-software/thingspro-2). It integrates mqtt client and protobuffer which makes data exchanging become easily and narrow down the transmission bandwidth.
 
 Installation
 ------------
 
-Once you have installed Go, run these commands to install the `gotag`:
+Once you have installed Go, run these commands to install `Gotag`:
 
 ```bash
-    go get github.com/CPtung/gotag
+    go get github.com/MOXA-ISD/gotag
 ```
 
 Build a gotag client
@@ -16,7 +16,7 @@ Build a gotag client
 
 ```go
 import (
-    gotag github.com/CPtung/gotag
+    gotag github.com/MOXA-ISD/gotag
 )
 
 func main() {   
