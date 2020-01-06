@@ -62,3 +62,18 @@ func DecodePayload(payload []byte, tag *Tag) error {
 	tag.unit = data.GetUnit()
 	return nil
 }
+
+func ProtobufToTag(protobuf []*mxtag_pb.Tag) []Tag {
+	list := make([]Tag, 0, len(protobuf))
+	for _, data := range protobuf {
+		tag := Tag{}
+		tag.sourceName = data.GetEquipment()
+		tag.tagName = data.GetTag()
+		tag.val = getDecodeValue(data.GetValue(), data.GetValueType())
+		tag.valType = data.GetValueType()
+		tag.ts = data.GetAtMs()
+		tag.unit = data.GetUnit()
+		list = append(list, tag)
+	}
+	return list
+}

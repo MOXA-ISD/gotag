@@ -21,3 +21,22 @@ message Tag
   optional int32  value_type = 5;
   optional string unit = 6;
 }
+
+message RequestData
+{
+  optional string module = 1;
+  optional string device = 2;
+  optional string name   = 3;
+}
+
+message Request
+{
+  optional string method = 1;
+  repeated RequestData list = 2;
+}
+
+message Response
+{
+  optional string method = 1;
+  repeated Tag list = 2;
+}

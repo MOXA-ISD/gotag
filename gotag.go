@@ -5,7 +5,8 @@ import (
 )
 
 type Tagf struct {
-    client  MsgQueueBase
+    client     MsgQueueBase
+    api        *DXApi
 }
 
 func getHost(host []string) string {
@@ -29,8 +30,14 @@ func NewClient(host ...string) (*Tagf, error) {
         return nil, err
     }
 
+    api := NewDXApi()
+    if err = api.Dail(); err != nil {
+	return nil, err
+    }
+
     return &Tagf{
         client: c,
+	api: api,
     }, nil
 }
 
@@ -69,9 +76,18 @@ func(self *Tagf) SubscribeCallback(ontag OnTagCallback) error {
     return self.client.SubscribeCallback(ontag)
 }
 
+func(self *Tagf) Get(module, source, tag string) *Tag {
+	return self.api.GetTagValue(module, source, tag)
+}
+
+func(self *Tagf) TagList() []Tag {
+	return nil
+}
+
 func(self *Tagf) Delete() error {
     if !(self != nil && self.client != nil) {
         return errors.New("tag client not found")
     }
+    self.api.Close()
     return self.client.Close()
 }

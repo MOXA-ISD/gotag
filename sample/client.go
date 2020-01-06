@@ -6,7 +6,7 @@ import (
     "syscall"
     "os/signal"
 
-    t "github.com/CPtung/gotag"
+    t "github.com/MOXA-ISD/gotag"
 )
 
 func Exit() chan os.Signal {
@@ -64,7 +64,7 @@ func main() {
 
     _tag.SubscribeCallback(Handler)
     _tag.Subscribe("gotag", "test")
-
+/*
     value := t.NewValue(1.414)
     _tag.Publish("gotag", "test", value, t.TAG_VALUE_TYPE_DOUBLE, 1546920188000, "v")
     var iTest int64 = -12345
@@ -81,7 +81,11 @@ func main() {
     _tag.Publish("gotag", "test", value, t.TAG_VALUE_TYPE_STRING, 1546920188000, "v")
     var bTest []byte = []byte("Thingspro")
     value = t.NewValue(bTest)
-    _tag.Publish("gotag", "test", value, t.TAG_VALUE_TYPE_BYTEARRAY, 1546920188000, "v")
+    _tag.Publish("gotag", "test", value, t.TAG_VALUE_TYPE_BYTEARRAY, 1546920188000, "v")*/
+
+	log.Println("get tag value")
+	t := _tag.Get("modbus", "ioLogik", "di0")
+	log.Printf("value: %v\n", t)
 
     <-Exit()
 }
