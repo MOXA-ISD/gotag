@@ -17,15 +17,18 @@ const (
     TAG_VALUE_TYPE_INT8         = 1
     TAG_VALUE_TYPE_INT16        = 2
     TAG_VALUE_TYPE_INT32        = 3
-    TAG_VALUE_TYPE_INT          = 4
-    TAG_VALUE_TYPE_UINT8        = 5
-    TAG_VALUE_TYPE_UINT16       = 6
-    TAG_VALUE_TYPE_UINT32       = 7
-    TAG_VALUE_TYPE_UINT         = 8
-    TAG_VALUE_TYPE_FLOAT        = 9
-    TAG_VALUE_TYPE_DOUBLE       = 10
-    TAG_VALUE_TYPE_STRING       = 11
-    TAG_VALUE_TYPE_BYTEARRAY    = 12
+    TAG_VALUE_TYPE_INT64        = 4
+    TAG_VALUE_TYPE_INT          = 5
+    TAG_VALUE_TYPE_UINT8        = 6
+    TAG_VALUE_TYPE_UINT16       = 7
+    TAG_VALUE_TYPE_UINT32       = 8
+    TAG_VALUE_TYPE_UINT64       = 9
+    TAG_VALUE_TYPE_UINT         = 10
+    TAG_VALUE_TYPE_FLOAT        = 11
+    TAG_VALUE_TYPE_DOUBLE       = 12
+    TAG_VALUE_TYPE_STRING       = 13
+    TAG_VALUE_TYPE_BYTEARRAY    = 14
+    TAG_VALUE_TYPE_RAW          = 0xFF
 )
 
 type Value struct {
@@ -35,6 +38,7 @@ type Value struct {
     d	float64
     s	string
     b	[]byte
+    rp  []byte
 }
 
 func (m *Value) GetFloat() float32 {
