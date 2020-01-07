@@ -1,4 +1,4 @@
-# Gotag [![Build Status](http://icsdrone.moxa.online/api/badges/MOXA-ISD/gotag/status.svg?ref=refs/heads/chore/deb)](http://icsdrone.moxa.online/MOXA-ISD/gotag)
+# Gotag [![Build Status](http://icsdrone.moxa.online/api/badges/MOXA-ISD/gotag/status.svg?ref=refs/heads/develop)](http://icsdrone.moxa.online/MOXA-ISD/gotag)
 
 GoTag is a Go pakcage for [ThingsPro](https://www.moxa.com/en/products/industrial-computing/system-software/thingspro-2). It integrates mqtt client and protobuffer which makes data exchanging become easily and narrow down the transmission bandwidth.
 
@@ -97,6 +97,7 @@ func Subscribe(client *gotag.Tagf) {
 Gotag needs to register a callback function for subscribed topics.
 ```go
 func Handler(module, source, tag string, val *t.Value, valtype uint16, ts uint64) {
+    fmt.Printf("Module: %v,", module)
     fmt.Printf("Source: %v,", source)
     fmt.Printf("Tag: %v,", tag)
     fmt.Printf("Value: %v,", val.GetDouble())
