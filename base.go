@@ -10,18 +10,9 @@ type MQConfig struct {
 }
 
 type OnTagCallback func(
+    moduleName  string,
     sourceName  string,
     tagName     string,
     value       *Value,
-    valueType   int32,
-    timestamp   uint64,
-    unit        string)
-
-
-type MsgQueueBase interface {
-    Publish(topic string, payload []byte)   error
-    Subscribe(topic string)                 error
-    UnSubscribe(topic string)               error
-    SubscribeCallback(ontag OnTagCallback)  error
-    Close()                                 error
-}
+    valueType   uint16,
+    timestamp   uint64)

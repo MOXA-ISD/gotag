@@ -1,0 +1,23 @@
+---
+kind: pipeline
+name: gotag-ci
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: unittest
+  image: golang:1.12-stretch
+  commands:
+  - apt-get update && apt-get install -y -f ./third_party/*.deb
+  - cp -rf ./third_party/mosquitto.conf /etc/mosquitto/mosquitto.conf
+  - /usr/sbin/mosquitto -c /etc/mosquitto/mosquitto.conf &
+  - go vet -printf=true -unreachable=true ./*.go
+  - go test -v -cover=true .
+  when:
+    event:
+      exclude:
+      - promote
+
+...
