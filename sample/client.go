@@ -6,7 +6,7 @@ import (
     "syscall"
     "os/signal"
 
-    t "github.com/CPtung/gotag"
+    t "github.com/MOXA-ISD/gotag"
 )
 
 func Exit() chan os.Signal {
@@ -15,7 +15,7 @@ func Exit() chan os.Signal {
     return quit
 }
 
-func Handler(source string, tag string, val *t.Value, valtype int32, ts uint64, unit string) {
+func Handler(module, source, tag string, val *t.Value, valtype uint16, ts uint64) {
     log.Printf("Source: %v,", source)
     log.Printf("Tag: %v,", tag)
     switch (valtype) {
@@ -51,7 +51,6 @@ func Handler(source string, tag string, val *t.Value, valtype int32, ts uint64, 
             break
     }
     log.Printf("At: %v,", ts)
-    log.Printf("Unit: %v\n", unit)
 }
 
 func main() {
@@ -63,25 +62,30 @@ func main() {
     defer _tag.Delete()
 
     _tag.SubscribeCallback(Handler)
-    _tag.Subscribe("gotag", "test")
+    _tag.Subscribe("+", "+", "+")
 
+	// double value
     value := t.NewValue(1.414)
-    _tag.Publish("gotag", "test", value, t.TAG_VALUE_TYPE_DOUBLE, 1546920188000, "v")
+	_tag.Publish("moxa", "gotag", "test", value, t.TAG_VALUE_TYPE_DOUBLE, 1546920188000)
+	// int value
     var iTest int64 = -12345
     value = t.NewValue(iTest)
-    _tag.Publish("gotag", "test", value, t.TAG_VALUE_TYPE_INT, 1546920188000, "v")
+    _tag.Publish("moxa", "gotag", "test", value, t.TAG_VALUE_TYPE_INT, 1546920188000)
+	// uint value
     var uTest uint64 = 12345
     value = t.NewValue(uTest)
-    _tag.Publish("gotag", "test", value, t.TAG_VALUE_TYPE_UINT, 1546920188000, "v")
+    _tag.Publish("moxa", "gotag", "test", value, t.TAG_VALUE_TYPE_UINT, 1546920188000)
+	// float value
     var fTest float32 = 1.1444
     value = t.NewValue(fTest)
-    _tag.Publish("gotag", "test", value, t.TAG_VALUE_TYPE_FLOAT, 1546920188000, "v")
+    _tag.Publish("moxa", "gotag", "test", value, t.TAG_VALUE_TYPE_FLOAT, 1546920188000)
+	// bytearray value
+    var bTest []byte = []byte("Thingspro")
+    va := t.NewValue(bTest)
+    _tag.Publish("moxa", "gotag", "test", va, t.TAG_VALUE_TYPE_BYTEARRAY, 1546920188000)
+	// string value
     var strTest string = "thingspro-gotag-test"
     value = t.NewValue(strTest)
-    _tag.Publish("gotag", "test", value, t.TAG_VALUE_TYPE_STRING, 1546920188000, "v")
-    var bTest []byte = []byte("Thingspro")
-    value = t.NewValue(bTest)
-    _tag.Publish("gotag", "test", value, t.TAG_VALUE_TYPE_BYTEARRAY, 1546920188000, "v")
-
+    _tag.Publish("moxa", "gotag", "test", value, t.TAG_VALUE_TYPE_STRING, 1546920188000)
     <-Exit()
 }
