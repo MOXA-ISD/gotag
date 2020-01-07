@@ -5,60 +5,38 @@ import (
 )
 
 type Tagf struct {
-    client  MsgQueueBase
+    client	*DataExchange
 }
 
-func getHost(host []string) string {
-    if len(host) > 0 {
-        return host[0]
+func NewClient() (*Tagf, error) {
+    c := NewDataExchange()
+    if c == nil {
+		return nil, errors.New("create data exchange client failed")
     }
-    return ""
+    return &Tagf{client: c,}, nil
 }
 
-func NewClient(host ...string) (*Tagf, error) {
-    config := &MQConfig{
-                Host: getHost(host),
-                Port: "1883",
-                Qos: 0,
-                Retained: false,
-                Debug: "error",
-             }
-
-    c, err := NewMqtt(config)
-    if err != nil {
-        return nil, err
-    }
-
-    return &Tagf{
-        client: c,
-    }, nil
-}
-
-func(self *Tagf) Publish(sourceName string, tagName string, val *Value, valType int32, timestamp uint64, unit string) error {
+func(self *Tagf) Publish(modName, srcName, tagName string, val *Value, valType uint16, timestamp uint64) error {
     if !(self != nil && self.client != nil) {
         return errors.New("tag client not found")
     }
-    topic := EncodeTopic(sourceName, tagName)
-    payload := EncodePayload(sourceName, tagName, val, valType, timestamp, unit)
-    if payload == nil {
-        return errors.New("Invalid Input")
-    }
-    return self.client.Publish(topic, payload)
+    topic := EncodeTopic(modName, srcName, tagName)
+    return self.client.Publish(topic, valType, val, timestamp)
 }
 
-func(self *Tagf) Subscribe(sourceName, tagName string) error {
+func(self *Tagf) Subscribe(modName, sourceName, tagName string) error {
     if !(self != nil && self.client != nil) {
         return errors.New("tag client not found")
     }
-    topic := EncodeTopic(sourceName, tagName)
+    topic := EncodeTopic(modName, sourceName, tagName)
     return self.client.Subscribe(topic)
 }
 
-func(self *Tagf) UnSubscribe(sourceName, tagName string) error {
+func(self *Tagf) UnSubscribe(modName, sourceName, tagName string) error {
     if !(self != nil && self.client != nil) {
         return errors.New("tag client not found")
     }
-    topic := EncodeTopic(sourceName, tagName)
+    topic := EncodeTopic(modName, sourceName, tagName)
     return self.client.UnSubscribe(topic)
 }
 
@@ -67,6 +45,14 @@ func(self *Tagf) SubscribeCallback(ontag OnTagCallback) error {
         return errors.New("tag client not found")
     }
     return self.client.SubscribeCallback(ontag)
+}
+
+func(self *Tagf) Get(module, source, tag string) *Tag {
+	return nil
+}
+
+func(self *Tagf) TagList() []Tag {
+	return nil
 }
 
 func(self *Tagf) Delete() error {
