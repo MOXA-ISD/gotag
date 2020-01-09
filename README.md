@@ -14,7 +14,7 @@ Since `Gotag` is a golang version wrapper of libmx-dx, you will also need to ins
 [[armhf](https://moxaics.s3-ap-northeast-1.amazonaws.com/v3/edge/builds/mosquitto/feat/support-unixsocket/16/libmosquitto1_1.6.8-1%2Bun1_armhf.deb)] [[amd64](https://moxaics.s3-ap-northeast-1.amazonaws.com/v3/edge/builds/mosquitto/feat/support-unixsocket/16/libmosquitto1_1.6.8-1%2Bun1_amd64.deb)]
 
 #### libmx-dx1
-[[armhf](https://moxaics.s3-ap-northeast-1.amazonaws.com/v3/edge/builds/edge-dx-engine/refactor/dx-unix/72/build-armhf/libmx-dx1_0.12.2-1_armhf.deb)] [[amd64](https://moxaics.s3-ap-northeast-1.amazonaws.com/v3/edge/builds/edge-dx-engine/refactor/dx-unix/72/build-amd64/libmx-dx1_0.12.2-1_amd64.deb)]
+[[armhf](https://moxaics.s3-ap-northeast-1.amazonaws.com/v3/edge/builds/edge-dx-engine/chore/deb/78/build-armhf/libmx-dx1_0.12.3-1_armhf.deb)] [[amd64](https://moxaics.s3-ap-northeast-1.amazonaws.com/v3/edge/builds/edge-dx-engine/chore/deb/78/build-amd64/libmx-dx-dev_0.12.3-1_amd64.deb)]
 
 
 ### Apt Install
@@ -25,15 +25,24 @@ apt-get install -y -f ./*.deb
 
 ### Docker Image
 If you are a docker user, downsizing the image could be the one of tough issues.
-We provide the following sample for you to only copy the necessary libraries.
-```yaml
+We provide the following sample for you to easily copy the necessary libraries in a Dockerfile.
+```
+RUN mkdir -p /usr/include/libmx-dx
+COPY --from=build-env \
+		/usr/include/libmx-dx \
+		/usr/include/libmx-dx
+
+COPY --from=build-env \
+		/usr/include/parson.h \
+		/usr/include/mosquitto.h \
+		/usr/include/
+
 COPY --from=build-env \
         /usr/lib/arm-linux-gnueabihf/libmx* \
         /usr/lib/arm-linux-gnueabihf/libparson.so* \
         /usr/lib/arm-linux-gnueabihf/libssl.so* \
         /usr/lib/arm-linux-gnueabihf/libcrypto.so* \
         /usr/lib/arm-linux-gnueabihf/libprotobuf-c* \
-        /usr/lib/arm-linux-gnueabihf/libcares.so* \
         /usr/lib/arm-linux-gnueabihf/libmosquitto* \
         /usr/lib/arm-linux-gnueabihf/
 ```
