@@ -145,7 +145,7 @@ func Test_GoTag_Publish_Float(t *testing.T) {
 	_tag.SubscribeCallback(Handler)
 	_tag.Subscribe(module, source, tag)
 
-	var fTest float32 = 1.1444
+	var fTest float32 = 1.0999999
 	value := gotag.NewValue(fTest)
 	_tag.Publish(module, source, tag, value, dType, ts)
 	time.Sleep(1 * time.Second)
@@ -238,7 +238,7 @@ func Test_GoTag_Publish_Double(t *testing.T) {
 	_tag.SubscribeCallback(Handler)
 	_tag.Subscribe(module, source, tag)
 
-	var dTest float64 = 123.033321
+	var dTest float64 = 123.099999999999999
 	value := gotag.NewValue(dTest)
 	_tag.Publish(module, source, tag, value, dType, ts)
 	time.Sleep(1 * time.Second)
