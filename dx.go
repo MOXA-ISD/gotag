@@ -137,8 +137,8 @@ func EncodeDxValue(val *Value, v *C.DX_TAG_VALUE, valType uint16) {
 		case C.DX_TAG_VALUE_TYPE_INT, C.DX_TAG_VALUE_TYPE_INT8, C.DX_TAG_VALUE_TYPE_INT16,
 				C.DX_TAG_VALUE_TYPE_INT32, C.DX_TAG_VALUE_TYPE_INT64:
 			C.to_int_value((*C.int64_t)(unsafe.Pointer(&val.i)), v, 1);
-		case C.DX_TAG_VALUE_TYPE_UINT, C.DX_TAG_VALUE_TYPE_UINT8,
-				C.DX_TAG_VALUE_TYPE_UINT16, C.DX_TAG_VALUE_TYPE_UINT32:
+		case C.DX_TAG_VALUE_TYPE_UINT, C.DX_TAG_VALUE_TYPE_UINT8, C.DX_TAG_VALUE_TYPE_UINT16,
+				C.DX_TAG_VALUE_TYPE_UINT32, C.DX_TAG_VALUE_TYPE_UINT64:
 			C.to_uint_value((*C.uint64_t)(unsafe.Pointer(&val.u)), v, 1);
 		case C.DX_TAG_VALUE_TYPE_FLOAT:
 			C.to_float_value((*C.float)(unsafe.Pointer(&val.f)), v, 1);
@@ -166,8 +166,8 @@ func DecodeDxValue(val *Value, v *C.DX_TAG_VALUE, valType uint16) {
 		case C.DX_TAG_VALUE_TYPE_INT, C.DX_TAG_VALUE_TYPE_INT8, C.DX_TAG_VALUE_TYPE_INT16,
 				C.DX_TAG_VALUE_TYPE_INT32, C.DX_TAG_VALUE_TYPE_INT64:
 			C.to_int_value((*C.int64_t)(unsafe.Pointer(&val.i)), v, 0);
-		case C.DX_TAG_VALUE_TYPE_UINT, C.DX_TAG_VALUE_TYPE_UINT8,
-				C.DX_TAG_VALUE_TYPE_UINT16, C.DX_TAG_VALUE_TYPE_UINT32:
+		case C.DX_TAG_VALUE_TYPE_UINT, C.DX_TAG_VALUE_TYPE_UINT8, C.DX_TAG_VALUE_TYPE_UINT16,
+			C.DX_TAG_VALUE_TYPE_UINT32, C.DX_TAG_VALUE_TYPE_UINT64:
 			C.to_uint_value((*C.uint64_t)(unsafe.Pointer(&val.u)), v, 0);
 		case C.DX_TAG_VALUE_TYPE_FLOAT:
 			C.to_float_value((*C.float)(unsafe.Pointer(&val.f)), v, 0);
