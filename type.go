@@ -83,6 +83,13 @@ func (m *Value) GetBytes() []byte {
     return nil
 }
 
+func (m *Value) GetRaw() []byte {
+    if m != nil {
+        return m.rp
+    }
+    return nil
+}
+
 func NewValue(value interface{}) *Value {
     switch reflect.TypeOf(value).Kind() {
     case reflect.Int:

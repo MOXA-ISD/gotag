@@ -137,32 +137,25 @@ func EncodeDxValue(val *Value, v *C.DX_TAG_VALUE, valType uint16) {
 		case C.DX_TAG_VALUE_TYPE_INT, C.DX_TAG_VALUE_TYPE_INT8, C.DX_TAG_VALUE_TYPE_INT16,
 				C.DX_TAG_VALUE_TYPE_INT32, C.DX_TAG_VALUE_TYPE_INT64:
 			C.to_int_value((*C.int64_t)(unsafe.Pointer(&val.i)), v, 1);
-			break
-		case C.DX_TAG_VALUE_TYPE_UINT, C.DX_TAG_VALUE_TYPE_UINT8,
-				C.DX_TAG_VALUE_TYPE_UINT16, C.DX_TAG_VALUE_TYPE_UINT32:
+		case C.DX_TAG_VALUE_TYPE_UINT, C.DX_TAG_VALUE_TYPE_UINT8, C.DX_TAG_VALUE_TYPE_UINT16,
+				C.DX_TAG_VALUE_TYPE_UINT32, C.DX_TAG_VALUE_TYPE_UINT64:
 			C.to_uint_value((*C.uint64_t)(unsafe.Pointer(&val.u)), v, 1);
-			break
 		case C.DX_TAG_VALUE_TYPE_FLOAT:
 			C.to_float_value((*C.float)(unsafe.Pointer(&val.f)), v, 1);
-			break
 		case C.DX_TAG_VALUE_TYPE_DOUBLE:
 			C.to_double_value((*C.double)(unsafe.Pointer(&val.d)), v, 1);
-			break
 		case C.DX_TAG_VALUE_TYPE_STRING:
 			cstr := C.CString(val.s)
 			defer C.free(unsafe.Pointer(cstr))
 			C.to_str_value((**C.char)(unsafe.Pointer(&cstr)), v, 1);
-			break
 		case C.DX_TAG_VALUE_TYPE_BYTEARRAY:
 			ucstr := (*C.uint8_t)(C.CBytes(val.b))
 			defer C.free(unsafe.Pointer(ucstr))
 			C.to_bytearray_value((**C.uint8_t)(unsafe.Pointer(&ucstr)), C.int(len(val.b)), v, 1);
-			break
 		case C.DX_TAG_VALUE_TYPE_RAW:
-			ucstr := (*C.uint8_t)(C.CBytes(val.b))
+			ucstr := (*C.uint8_t)(C.CBytes(val.rp))
 			defer C.free(unsafe.Pointer(ucstr))
 			C.to_raw_value((**C.uint8_t)(unsafe.Pointer(&ucstr)), C.int(len(val.rp)), v, 1);
-			break
 	}
 }
 
@@ -173,41 +166,29 @@ func DecodeDxValue(val *Value, v *C.DX_TAG_VALUE, valType uint16) {
 		case C.DX_TAG_VALUE_TYPE_INT, C.DX_TAG_VALUE_TYPE_INT8, C.DX_TAG_VALUE_TYPE_INT16,
 				C.DX_TAG_VALUE_TYPE_INT32, C.DX_TAG_VALUE_TYPE_INT64:
 			C.to_int_value((*C.int64_t)(unsafe.Pointer(&val.i)), v, 0);
-			break
-		case C.DX_TAG_VALUE_TYPE_UINT, C.DX_TAG_VALUE_TYPE_UINT8,
-				C.DX_TAG_VALUE_TYPE_UINT16, C.DX_TAG_VALUE_TYPE_UINT32:
+		case C.DX_TAG_VALUE_TYPE_UINT, C.DX_TAG_VALUE_TYPE_UINT8, C.DX_TAG_VALUE_TYPE_UINT16,
+			C.DX_TAG_VALUE_TYPE_UINT32, C.DX_TAG_VALUE_TYPE_UINT64:
 			C.to_uint_value((*C.uint64_t)(unsafe.Pointer(&val.u)), v, 0);
-			break
 		case C.DX_TAG_VALUE_TYPE_FLOAT:
 			C.to_float_value((*C.float)(unsafe.Pointer(&val.f)), v, 0);
-			break
 		case C.DX_TAG_VALUE_TYPE_DOUBLE:
 			C.to_double_value((*C.double)(unsafe.Pointer(&val.d)), v, 0);
-			break
 		case C.DX_TAG_VALUE_TYPE_STRING:
 			cstr := (*C.char)(C.malloc(C.sizeof_char))
-			defer C.free(unsafe.Pointer(cstr))
 			C.to_str_value((**C.char)(unsafe.Pointer(&cstr)), v, 0);
 			if cstr != nil {
 				val.s = C.GoString(cstr)
+				defer C.free(unsafe.Pointer(cstr))
 			}
-			break
+		case C.DX_TAG_VALUE_TYPE_RAW:
+			fallthrough
 		case C.DX_TAG_VALUE_TYPE_BYTEARRAY:
 			ucstr := (*C.uint8_t)(C.malloc(C.sizeof_uint8_t))
-			defer C.free(unsafe.Pointer(ucstr))
 			bsize := C.to_bytearray_value((**C.uint8_t)(unsafe.Pointer(&ucstr)), 0, v, 0);
 			if ucstr != nil {
 				val.b = C.GoBytes(unsafe.Pointer(ucstr), bsize)
+				defer C.free(unsafe.Pointer(ucstr))
 			}
-			break
-		case C.DX_TAG_VALUE_TYPE_RAW:
-			ucstr := (*C.uint8_t)(C.malloc(C.sizeof_uint8_t))
-			defer C.free(unsafe.Pointer(ucstr))
-			bsize := C.to_raw_value((**C.uint8_t)(unsafe.Pointer(&ucstr)), 0, v, 0);
-			if ucstr != nil {
-				val.rp = C.GoBytes(unsafe.Pointer(ucstr), bsize)
-			}
-			break
 	}
 }
 
