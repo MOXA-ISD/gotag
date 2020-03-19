@@ -105,8 +105,6 @@ import "C"
 import "unsafe"
 
 import (
-	"fmt"
-	"regexp"
 	"strings"
 	"github.com/mattn/go-pointer"
 )
@@ -121,13 +119,9 @@ func EncodeTopic(module, source, tag string) string {
     return topic.String()
 }
 
-func DecodeTopic(topic string) (string, string, string, error) {
-	re := regexp.MustCompile("/")
-	tokens := re.Split(topic, -1)
-	if tokens != nil && len(tokens) > 2 {
-		return tokens[0], tokens[1], tokens[2], nil
-	}
-	return "", "", "", fmt.Errorf("invalid topic format")
+func DecodeTopic(topic string) (string, string, string) {
+	tokens := strings.Split(topic, "/")
+	return tokens[0], tokens[1], tokens[2]
 }
 
 func EncodeDxValue(val *Value, v *C.DX_TAG_VALUE, valType uint16) {

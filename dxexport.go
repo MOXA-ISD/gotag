@@ -19,30 +19,23 @@ import (
 //export dxSubCallback
 func dxSubCallback(dx_tag_obj *C.DX_TAG_OBJ, obj_cnt C.uint16_t, user_data unsafe.Pointer) {
 	var (
-		val Value = Value{}
-		err error
+		val Value
 		module, src, tag string
-		i, numsObj uint16
 		ptr uintptr
 		obj *C.DX_TAG_OBJ
 	)
 	dx := pointer.Restore(user_data).(*DataExchange)
-	if dx.ontag != nil && obj_cnt >= 0 {
-		numsObj = uint16(obj_cnt)
+	if dx.ontag != nil {
+		val = Value{}
 		ptr = uintptr(unsafe.Pointer(dx_tag_obj))
-		for i = 0; i < numsObj; i++ {
-			obj = (*C.DX_TAG_OBJ)(unsafe.Pointer(ptr))
-			DecodeDxValue(&val, &obj.val, uint16(obj.val_type))
-			if module, src, tag, err = DecodeTopic(C.GoString(obj.tag)); err != nil {
-				continue
-			}
-			dx.ontag(module, src, tag, &val, uint16(obj.val_type), uint64(obj.timestamp))
-			ptr = (uintptr)(unsafe.Pointer(ptr)) + (uintptr)(C.sizeof_DX_TAG_OBJ * C.int(i))
-		}
+		obj = (*C.DX_TAG_OBJ)(unsafe.Pointer(ptr))
+		DecodeDxValue(&val, &obj.val, uint16(obj.val_type))
+		module, src, tag = DecodeTopic(C.GoString(obj.tag))
+		dx.ontag(module, src, tag, &val, uint16(obj.val_type), uint64(obj.timestamp))
 	}
 }
 
-func(d *DataExchange)Publish(topic string, valType uint16, val *Value, ts uint64) error {
+func(d *DataExchange) Publish(topic string, valType uint16, val *Value, ts uint64) error {
 	if d.c == nil {
 		return errors.New("tag client not found")
 	}
@@ -64,7 +57,7 @@ func(d *DataExchange)Publish(topic string, valType uint16, val *Value, ts uint64
 	return nil
 }
 
-func(d *DataExchange)Subscribe(topic string) error {
+func(d *DataExchange) Subscribe(topic string) error {
 	if d.c == nil {
 		return errors.New("tag client not found")
 	}
@@ -87,7 +80,7 @@ func(d *DataExchange)Subscribe(topic string) error {
 	return nil
 }
 
-func(d *DataExchange)UnSubscribe(topic string) error {
+func(d *DataExchange) UnSubscribe(topic string) error {
 	if d.c == nil {
 		return errors.New("tag client not found")
 	}
@@ -101,7 +94,7 @@ func(d *DataExchange)UnSubscribe(topic string) error {
 	return nil
 }
 
-func(d *DataExchange)SubscribeCallback(hnd OnTagCallback) error {
+func(d *DataExchange) SubscribeCallback(hnd OnTagCallback) error {
 	if d.c == nil {
 		return errors.New("tag client not found")
 	}
@@ -109,7 +102,7 @@ func(d *DataExchange)SubscribeCallback(hnd OnTagCallback) error {
 	return nil
 }
 
-func(d *DataExchange)Close() error {
+func(d *DataExchange) Close() error {
 	if d.c != nil {
 	C.dx_tag_destroy(d.c)
 	}
