@@ -5,17 +5,11 @@ GoTag is a Go pakcage for [ThingsPro](https://www.moxa.com/en/products/industria
 Installation
 ------------
 
-Since `Gotag` is a golang version wrapper of libmx-dx, you will also need to install the necessary dynamic libraries from the following download links:
+Since `Gotag` is a golang version wrapper of libmx-dx, you will also need to install the necessary dynamic libraries from the 3rd-party directory:
 
 #### libparson1
-[[armhf](https://moxaics.s3-ap-northeast-1.amazonaws.com/debian/all/libparson1_1.1.0-1_armhf.deb)] [[amd64](https://moxaics.s3-ap-northeast-1.amazonaws.com/debian/all/libparson1_1.1.0-1_amd64.deb)]
-
 #### libmosquitto1
-[[armhf](https://moxaics.s3-ap-northeast-1.amazonaws.com/v3/edge/builds/mosquitto/feat/support-unixsocket/16/libmosquitto1_1.6.8-1%2Bun1_armhf.deb)] [[amd64](https://moxaics.s3-ap-northeast-1.amazonaws.com/v3/edge/builds/mosquitto/feat/support-unixsocket/16/libmosquitto1_1.6.8-1%2Bun1_amd64.deb)]
-
 #### libmx-dx1
-[[armhf](https://moxaics.s3-ap-northeast-1.amazonaws.com/v3/edge/builds/edge-dx-engine/chore/deb/78/build-armhf/libmx-dx1_0.12.3-1_armhf.deb)] [[amd64](https://moxaics.s3-ap-northeast-1.amazonaws.com/v3/edge/builds/edge-dx-engine/chore/deb/78/build-amd64/libmx-dx-dev_0.12.3-1_amd64.deb)]
-
 
 ### Apt Install
 ```bash
