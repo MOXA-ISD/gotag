@@ -18,20 +18,19 @@ const (
 	TAG_VALUE_TYPE_INT16     = 2
 	TAG_VALUE_TYPE_INT32     = 3
 	TAG_VALUE_TYPE_INT64     = 4
-	TAG_VALUE_TYPE_INT       = 5
-	TAG_VALUE_TYPE_UINT8     = 6
-	TAG_VALUE_TYPE_UINT16    = 7
-	TAG_VALUE_TYPE_UINT32    = 8
-	TAG_VALUE_TYPE_UINT64    = 9
-	TAG_VALUE_TYPE_UINT      = 10
-	TAG_VALUE_TYPE_FLOAT     = 11
-	TAG_VALUE_TYPE_DOUBLE    = 12
-	TAG_VALUE_TYPE_STRING    = 13
-	TAG_VALUE_TYPE_BYTEARRAY = 14
-	TAG_VALUE_TYPE_RAW       = 0xFF
+	TAG_VALUE_TYPE_UINT8     = 5
+	TAG_VALUE_TYPE_UINT16    = 6
+	TAG_VALUE_TYPE_UINT32    = 7
+	TAG_VALUE_TYPE_UINT64    = 8
+	TAG_VALUE_TYPE_FLOAT     = 9
+	TAG_VALUE_TYPE_DOUBLE    = 10
+	TAG_VALUE_TYPE_STRING    = 11
+	TAG_VALUE_TYPE_BYTEARRAY = 12
+	TAG_VALUE_TYPE_RAW       = 13
 )
 
 type Value struct {
+	bl bool
 	i  int64
 	u  uint64
 	f  float32
@@ -48,11 +47,23 @@ func (m *Value) GetFloat() float32 {
 	return 0
 }
 
+func (m *Value) SetFloat(f float32) {
+	if m != nil {
+		m.f = f
+	}
+}
+
 func (m *Value) GetDouble() float64 {
 	if m != nil {
 		return m.d
 	}
 	return 0
+}
+
+func (m *Value) SetDouble(d float64) {
+	if m != nil {
+		m.d = d
+	}
 }
 
 func (m *Value) GetInt() int64 {
@@ -62,11 +73,23 @@ func (m *Value) GetInt() int64 {
 	return 0
 }
 
+func (m *Value) SetInt(i int64) {
+	if m != nil {
+		m.i = i
+	}
+}
+
 func (m *Value) GetUint() uint64 {
 	if m != nil {
 		return m.u
 	}
 	return 0
+}
+
+func (m *Value) SetUint(u uint64) {
+	if m != nil {
+		m.u = u
+	}
 }
 
 func (m *Value) GetStr() string {
@@ -76,6 +99,12 @@ func (m *Value) GetStr() string {
 	return ""
 }
 
+func (m *Value) SetStr(s string) {
+	if m != nil {
+		m.s = s
+	}
+}
+
 func (m *Value) GetBytes() []byte {
 	if m != nil {
 		return m.b
@@ -83,11 +112,23 @@ func (m *Value) GetBytes() []byte {
 	return nil
 }
 
+func (m *Value) SetBytes(b []byte) {
+	if m != nil {
+		m.b = b
+	}
+}
+
 func (m *Value) GetRaw() []byte {
 	if m != nil {
 		return m.rp
 	}
 	return nil
+}
+
+func (m *Value) SetRaw(rp []byte) {
+	if m != nil {
+		m.rp = rp
+	}
 }
 
 func NewValue(value interface{}) *Value {
@@ -127,10 +168,10 @@ func NewValue(value interface{}) *Value {
 }
 
 type Tag struct {
-	sourceName string
-	tagName    string
-	val        *Value
-	valType    int32
-	ts         uint64
-	unit       string
+	SourceName string
+	TagName    string
+	Val        *Value
+	ValType    int32
+	Ts         uint64
+	Unit       string
 }
