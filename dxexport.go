@@ -41,8 +41,7 @@ func (d *DataExchange) Publish(topic string, valType uint16, val *Value, ts uint
 	defer C.free(unsafe.Pointer(cstrTopic))
 	// convert go value to dx value
 	dxVal, size := EncodeDxValue(val, valType)
-	//defer FreeAlloc(dxVal)
-	//defer C.free(unsafe.Pointer(dxVal))
+
 	C.dx_tag_instant_write(
 		d.c,
 		cstrTopic,

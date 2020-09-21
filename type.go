@@ -133,6 +133,8 @@ func (m *Value) SetRaw(rp []byte) {
 
 func NewValue(value interface{}) *Value {
 	switch reflect.TypeOf(value).Kind() {
+	case reflect.Bool:
+		return &Value{bl: value.(bool)}
 	case reflect.Int:
 		return &Value{i: int64(value.(int))}
 	case reflect.Int8:

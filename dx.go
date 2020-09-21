@@ -75,7 +75,26 @@ void to_bool_value(int64_t *i, void *val) {
 }
 
 void to_int_value(int64_t *i, void *val, size_t size) {
-	memcpy(i, val, size);
+	int8_t i8;
+	int16_t i16;
+	int32_t i32;
+	switch (size) {
+	case 1:
+		memcpy(&i8, val, size);
+		*i = (int64_t)i8;
+		break;
+	case 2:
+		memcpy(&i16, val, size);
+		*i = (int64_t)i16;
+		break;
+	case 4:
+		memcpy(&i32, val, size);
+		*i = (int64_t)i32;
+		break;
+	case 8:
+		memcpy(i, val, size);
+		break;
+	}
 }
 void to_uint_value(uint64_t *u, void *val, size_t size) {
 	memcpy(u, val, size);
@@ -179,7 +198,7 @@ func EncodeDxValue(val *Value, valType uint16) (unsafe.Pointer, uint32) {
 	case C.DX_TAG_VALUE_TYPE_STRING:
 		cstr := C.CString(val.s)
 		defer C.free(unsafe.Pointer(cstr))
-		return unsafe.Pointer(C.to_str_value((**C.char)(unsafe.Pointer(&cstr)))), uint32(len(val.s))
+		return unsafe.Pointer(C.to_str_value((**C.char)(unsafe.Pointer(&cstr)))), uint32(len(val.s) + 1)
 	case C.DX_TAG_VALUE_TYPE_BYTEARRAY:
 		ucstr := (*C.uint8_t)(C.CBytes(val.b))
 		defer C.free(unsafe.Pointer(ucstr))
