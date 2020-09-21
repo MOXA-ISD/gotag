@@ -11,9 +11,6 @@ steps:
   image: golang:1.12-stretch
   commands:
   - apt-get update && apt-get install -y -f ./third_party/*.deb
-  - cp -rf ./third_party/mosquitto.conf /etc/mosquitto/mosquitto.conf
-  - mkdir -p /var/run/taghub
-  - /usr/sbin/mosquitto -c /etc/mosquitto/mosquitto.conf &
   - go vet -printf=true -unreachable=true ./*.go
   - go test -v -cover=true .
   when:
