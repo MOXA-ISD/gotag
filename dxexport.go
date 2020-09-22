@@ -83,6 +83,18 @@ func (d *DataExchange) SubscribeCallback(hnd OnTagCallback) error {
 	return nil
 }
 
+func (d *DataExchange) UnSubscribe(topic string) error {
+	if d.c == nil {
+		return errors.New("tag client not found")
+	}
+	// remove unsubscribed topic
+	if tag, ok := d.topics[topic]; ok {
+		C.dx_tag_destroy(d.c, tag)
+		delete(d.topics, topic)
+	}
+	return nil
+}
+
 func (d *DataExchange) Close() error {
 	// free all tags
 	for _, tag := range d.topics {

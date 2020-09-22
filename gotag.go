@@ -39,6 +39,14 @@ func (self *Tagf) SubscribeCallback(ontag OnTagCallback) error {
 	return self.client.SubscribeCallback(ontag)
 }
 
+func (self *Tagf) UnSubscribe(modName, sourceName, tagName string) error {
+	if !(self != nil && self.client != nil) {
+		return errors.New("tag client not found")
+	}
+	topic := EncodeTopic(modName, sourceName, tagName)
+	return self.client.UnSubscribe(topic)
+}
+
 func (self *Tagf) Unmarshal(module, source, tag string) *Tag {
 	return nil
 }
