@@ -27,6 +27,8 @@ const (
 	TAG_VALUE_TYPE_STRING    = 11
 	TAG_VALUE_TYPE_BYTEARRAY = 12
 	TAG_VALUE_TYPE_RAW       = 13
+	TAG_VALUE_TYPE_INT       = 90
+	TAG_VALUE_TYPE_UINT      = 91
 )
 
 type Value struct {

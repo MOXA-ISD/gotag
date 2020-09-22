@@ -40,7 +40,7 @@ func (d *DataExchange) Publish(topic string, valType uint16, val *Value, ts uint
 	cstrTopic := C.CString(topic)
 	defer C.free(unsafe.Pointer(cstrTopic))
 	// convert go value to dx value
-	dxVal, size := EncodeDxValue(val, valType)
+	dxVal, valType, size := EncodeDxValue(val, valType)
 
 	C.dx_tag_instant_write(
 		d.c,

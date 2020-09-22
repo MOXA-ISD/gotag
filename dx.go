@@ -171,45 +171,49 @@ func DecodeTopic(topic string) (string, string, string) {
 	return tokens[0], tokens[1], tokens[2]
 }
 
-func EncodeDxValue(val *Value, valType uint16) (unsafe.Pointer, uint32) {
+func EncodeDxValue(val *Value, valType uint16) (unsafe.Pointer, uint16, uint32) {
 	switch valType {
 	case C.DX_TAG_VALUE_TYPE_BOOLEAN:
-		return (unsafe.Pointer(&val.bl)), 1
+		return (unsafe.Pointer(&val.bl)), valType, 1
 	case C.DX_TAG_VALUE_TYPE_INT8:
-		return (unsafe.Pointer(&val.i)), 1
+		return (unsafe.Pointer(&val.i)), valType, 1
 	case C.DX_TAG_VALUE_TYPE_INT16:
-		return (unsafe.Pointer(&val.i)), 2
+		return (unsafe.Pointer(&val.i)), valType, 2
 	case C.DX_TAG_VALUE_TYPE_INT32:
-		return (unsafe.Pointer(&val.i)), 4
+		return (unsafe.Pointer(&val.i)), valType, 4
+	case TAG_VALUE_TYPE_INT:
+		fallthrough
 	case C.DX_TAG_VALUE_TYPE_INT64:
-		return (unsafe.Pointer(&val.i)), 8
+		return (unsafe.Pointer(&val.i)), C.DX_TAG_VALUE_TYPE_INT64, 8
 	case C.DX_TAG_VALUE_TYPE_UINT8:
-		return (unsafe.Pointer(&val.u)), 1
+		return (unsafe.Pointer(&val.u)), valType, 1
 	case C.DX_TAG_VALUE_TYPE_UINT16:
-		return (unsafe.Pointer(&val.u)), 2
+		return (unsafe.Pointer(&val.u)), valType, 2
 	case C.DX_TAG_VALUE_TYPE_UINT32:
-		return (unsafe.Pointer(&val.u)), 4
+		return (unsafe.Pointer(&val.u)), valType, 4
+	case TAG_VALUE_TYPE_UINT:
+		fallthrough
 	case C.DX_TAG_VALUE_TYPE_UINT64:
-		return (unsafe.Pointer(&val.u)), 8
+		return (unsafe.Pointer(&val.u)), C.DX_TAG_VALUE_TYPE_UINT64, 8
 	case C.DX_TAG_VALUE_TYPE_FLOAT:
-		return (unsafe.Pointer(&val.f)), 4
+		return (unsafe.Pointer(&val.f)), valType, 4
 	case C.DX_TAG_VALUE_TYPE_DOUBLE:
-		return (unsafe.Pointer(&val.d)), 8
+		return (unsafe.Pointer(&val.d)), valType, 8
 	case C.DX_TAG_VALUE_TYPE_STRING:
 		cstr := C.CString(val.s)
 		defer C.free(unsafe.Pointer(cstr))
-		return unsafe.Pointer(C.to_str_value((**C.char)(unsafe.Pointer(&cstr)))), uint32(len(val.s) + 1)
+		return unsafe.Pointer(C.to_str_value((**C.char)(unsafe.Pointer(&cstr)))), valType, uint32(len(val.s) + 1)
 	case C.DX_TAG_VALUE_TYPE_BYTEARRAY:
 		ucstr := (*C.uint8_t)(C.CBytes(val.b))
 		defer C.free(unsafe.Pointer(ucstr))
-		return unsafe.Pointer(C.to_bytearray_value((**C.uint8_t)(unsafe.Pointer(&ucstr)), C.int(len(val.b)))), uint32(len(val.b))
+		return unsafe.Pointer(C.to_bytearray_value((**C.uint8_t)(unsafe.Pointer(&ucstr)), C.int(len(val.b)))), valType, uint32(len(val.b))
 	case C.DX_TAG_VALUE_TYPE_RAW:
 		ucstr := (*C.uint8_t)(C.CBytes(val.rp))
 		defer C.free(unsafe.Pointer(ucstr))
-		return unsafe.Pointer(C.to_raw_value((**C.uint8_t)(unsafe.Pointer(&ucstr)), C.int(len(val.rp)))), uint32(len(val.rp))
+		return unsafe.Pointer(C.to_raw_value((**C.uint8_t)(unsafe.Pointer(&ucstr)), C.int(len(val.rp)))), valType, uint32(len(val.rp))
 	default:
-		fmt.Println("default type")
-		return nil, 0
+		fmt.Println("encoding tag format with unknown type")
+		return nil, valType, 0
 	}
 }
 
