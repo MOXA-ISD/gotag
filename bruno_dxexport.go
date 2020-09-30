@@ -1,4 +1,4 @@
-// +build THANOS_GOTAG
+// +build !THANOS_GOTAG
 
 package gotag
 
@@ -9,28 +9,33 @@ package gotag
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
-#include <dx.h>
+#include <libmx-dx/dx_api.h>
 */
 import "C"
+import "unsafe"
+
 import (
 	"errors"
-	"unsafe"
 
 	"github.com/mattn/go-pointer"
 )
 
 //export dxSubCallback
-func dxSubCallback(topic *C.char, value unsafe.Pointer, valueType C.dx_tag_value_type, valueSize C.uint32_t, timestamp C.uint64_t, userData unsafe.Pointer) {
+func dxSubCallback(dx_tag_obj *C.DX_TAG_OBJ, obj_cnt C.uint16_t, user_data unsafe.Pointer) {
 	var (
 		val              Value
 		module, src, tag string
+		ptr              uintptr
+		obj              *C.DX_TAG_OBJ
 	)
-	dx := pointer.Restore(userData).(*DataExchange)
+	dx := pointer.Restore(user_data).(*DataExchange)
 	if dx.ontag != nil {
 		val = Value{}
-		DecodeDxValue(&val, value, valueSize, uint16(valueType))
-		module, src, tag = DecodeTopic(C.GoString(topic))
-		dx.ontag(module, src, tag, &val, uint16(valueType), uint64(timestamp))
+		ptr = uintptr(unsafe.Pointer(dx_tag_obj))
+		obj = (*C.DX_TAG_OBJ)(unsafe.Pointer(ptr))
+		DecodeDxValue(&val, &obj.val, uint16(obj.val_type))
+		module, src, tag = DecodeTopic(C.GoString(obj.tag))
+		dx.ontag(module, src, tag, &val, uint16(obj.val_type), uint64(obj.timestamp))
 	}
 }
 
@@ -42,14 +47,15 @@ func (d *DataExchange) Publish(topic string, valType uint16, val *Value, ts uint
 	cstrTopic := C.CString(topic)
 	defer C.free(unsafe.Pointer(cstrTopic))
 	// convert go value to dx value
-	dxVal, valType, size := EncodeDxValue(val, valType)
+	dxVal := C.DX_TAG_VALUE{}
+	defer FreeAlloc(&dxVal, valType)
 
-	C.dx_tag_instant_write(
+	EncodeDxValue(val, &dxVal, valType)
+	C.dx_tag_pub(
 		d.c,
 		cstrTopic,
+		C.DX_TAG_VALUE_TYPE(valType),
 		dxVal,
-		C.dx_tag_value_type(valType),
-		C.uint32_t(size),
 		C.uint64_t(ts))
 	return nil
 }
@@ -58,22 +64,35 @@ func (d *DataExchange) Subscribe(topic string) error {
 	if d.c == nil {
 		return errors.New("tag client not found")
 	}
-
-	if _, ok := d.topics[topic]; ok {
-		return nil
-	}
-
 	// combile module, source, tag names to the publish topic
 	cstrTopic := C.CString(topic)
 	defer C.free(unsafe.Pointer(cstrTopic))
-
 	// subscribe topic
-	tag := C.dx_tag_consumer_new(
+	C.dx_tag_sub(
 		d.c,
-		cstrTopic)
-
+		cstrTopic,
+		nil)
 	// add subscribed topic
-	d.topics[topic] = tag
+	for i := range d.topics {
+		if d.topics[i] == topic {
+			return nil
+		}
+	}
+	d.topics = append(d.topics, topic)
+	return nil
+}
+
+func (d *DataExchange) UnSubscribe(topic string) error {
+	if d.c == nil {
+		return errors.New("tag client not found")
+	}
+	// remove unsubscribed topic
+	for i := range d.topics {
+		if d.topics[i] == topic {
+			d.topics = append(d.topics[:i], d.topics[i+1:]...)
+			break
+		}
+	}
 	return nil
 }
 
@@ -85,33 +104,15 @@ func (d *DataExchange) SubscribeCallback(hnd OnTagCallback) error {
 	return nil
 }
 
-func (d *DataExchange) UnSubscribe(topic string) error {
-	if d.c == nil {
-		return errors.New("tag client not found")
-	}
-	// remove unsubscribed topic
-	if tag, ok := d.topics[topic]; ok {
-		C.dx_tag_destroy(d.c, tag)
-		delete(d.topics, topic)
-	}
-	return nil
-}
-
 func (d *DataExchange) Close() error {
-	// free all tags
-	for _, tag := range d.topics {
-		C.dx_tag_destroy(d.c, tag)
-	}
-
 	if d.c != nil {
-		C.dx_destroy(d.c)
+		C.dx_tag_destroy(d.c)
 	}
 	return nil
 }
 
 type DataExchange struct {
-	c      *C.dx_t
-	name   string
-	topics map[string]*C.dx_tag_t
+	c      *C.DX_TAG_CLIENT
+	topics []string
 	ontag  OnTagCallback
 }

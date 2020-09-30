@@ -1,3 +1,5 @@
+// +build THANOS_GOTAG
+
 package gotag
 
 /*
