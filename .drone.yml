@@ -7,12 +7,23 @@ platform:
   arch: amd64
 
 steps:
-- name: unittest
+- name: thanos-unittest
   image: golang:1.12-stretch
   commands:
-  - apt-get update && apt-get install -y -f ./third_party/*.deb
+  - apt-get update && apt-get install -y -f ./third_party/thanos/*.deb
   - go vet -printf=true -unreachable=true ./*.go
-  - go test -v -cover=true .
+  - go test -v -cover=true -count=1 .
+  when:
+    event:
+      exclude:
+      - promote
+
+- name: bruno-unittest
+  image: golang:1.12-stretch
+  commands:
+  - apt-get update && apt-get install -y -f ./third_party/bruno/*.deb
+  - go vet -printf=true -unreachable=true ./*.go
+  - go test -v -cover=true -count=1 .
   when:
     event:
       exclude:
