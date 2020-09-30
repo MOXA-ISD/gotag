@@ -11,8 +11,7 @@ steps:
   image: golang:1.12-stretch
   commands:
   - apt-get update && apt-get install -y -f ./third_party/thanos/*.deb
-  - go vet -printf=true -unreachable=true ./*.go
-  - go test -v -cover=true -count=1 .
+  - go test -tags THANOS_GOTAG -v -cover=true -count=1 .
   when:
     event:
       exclude:
@@ -22,7 +21,9 @@ steps:
   image: golang:1.12-stretch
   commands:
   - apt-get update && apt-get install -y -f ./third_party/bruno/*.deb
-  - go vet -printf=true -unreachable=true ./*.go
+  - cp -rf ./third_party/bruno/mosquitto.conf /etc/mosquitto/mosquitto.conf
+  - mkdir -p /var/run/taghub
+  - /usr/sbin/mosquitto -c /etc/mosquitto/mosquitto.conf &
   - go test -v -cover=true -count=1 .
   when:
     event:
