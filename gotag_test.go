@@ -54,6 +54,8 @@ func Test_GoTag_Create(t *testing.T) {
 
 	publisher, err = gotag.NewClient()
 	assert.Equal(t, err, nil)
+
+	time.Sleep(time.Second)
 }
 
 func Test_GoTag_Publish_Boolean(t *testing.T) {
@@ -95,7 +97,7 @@ func Test_GoTag_Publish_Int8(t *testing.T) {
 	assert.Equal(t, tagName, tag)
 	assert.Equal(t, timestamp, ts)
 	assert.Equal(t, dataType, dType)
-	assert.Equal(t, value.GetInt(), retValue.GetInt())
+	assert.Equal(t, int8(value.GetInt()), int8(retValue.GetInt()))
 }
 
 func Test_GoTag_Publish_Int16(t *testing.T) {
@@ -116,7 +118,7 @@ func Test_GoTag_Publish_Int16(t *testing.T) {
 	assert.Equal(t, tagName, tag)
 	assert.Equal(t, timestamp, ts)
 	assert.Equal(t, dataType, dType)
-	assert.Equal(t, value.GetInt(), retValue.GetInt())
+	assert.Equal(t, int16(value.GetInt()), int16(retValue.GetInt()))
 }
 
 func Test_GoTag_Publish_Int32(t *testing.T) {
@@ -137,7 +139,7 @@ func Test_GoTag_Publish_Int32(t *testing.T) {
 	assert.Equal(t, tagName, tag)
 	assert.Equal(t, timestamp, ts)
 	assert.Equal(t, dataType, dType)
-	assert.Equal(t, value.GetInt(), retValue.GetInt())
+	assert.Equal(t, int32(value.GetInt()), int32(retValue.GetInt()))
 }
 
 func Test_GoTag_Publish_Int64(t *testing.T) {
@@ -158,27 +160,6 @@ func Test_GoTag_Publish_Int64(t *testing.T) {
 	assert.Equal(t, tagName, tag)
 	assert.Equal(t, timestamp, ts)
 	assert.Equal(t, dataType, dType)
-	assert.Equal(t, value.GetInt(), retValue.GetInt())
-}
-
-func Test_GoTag_Publish_Int(t *testing.T) {
-	var (
-		module string = "moxa-dx"
-		source string = "gotag"
-		tag    string = "int64"
-		ts     uint64 = uint64(uint64(gotag.GetTimestamp()))
-		dType  uint16 = gotag.TAG_VALUE_TYPE_INT
-	)
-
-	var iTest int64 = -1234567890
-	value := gotag.NewValue(iTest)
-	publisher.Publish(module, source, tag, value, dType, ts)
-	time.Sleep(100 * time.Millisecond)
-
-	assert.Equal(t, sourceName, source)
-	assert.Equal(t, tagName, tag)
-	assert.Equal(t, timestamp, ts)
-	assert.Equal(t, gotag.TAG_VALUE_TYPE_INT64, int(dataType))
 	assert.Equal(t, value.GetInt(), retValue.GetInt())
 }
 
@@ -221,27 +202,6 @@ func Test_GoTag_Publish_Uint64(t *testing.T) {
 	assert.Equal(t, tagName, tag)
 	assert.Equal(t, timestamp, ts)
 	assert.Equal(t, dataType, dType)
-	assert.Equal(t, value.GetUint(), retValue.GetUint())
-}
-
-func Test_GoTag_Publish_Uint(t *testing.T) {
-	var (
-		module string = "moxa-dx"
-		source string = "gotag"
-		tag    string = "uint64"
-		ts     uint64 = uint64(gotag.GetTimestamp())
-		dType  uint16 = gotag.TAG_VALUE_TYPE_UINT
-	)
-
-	var uTest uint64 = 18446744073709551615
-	value := gotag.NewValue(uTest)
-	publisher.Publish(module, source, tag, value, dType, ts)
-	time.Sleep(100 * time.Millisecond)
-
-	assert.Equal(t, sourceName, source)
-	assert.Equal(t, tag, tagName)
-	assert.Equal(t, ts, timestamp)
-	assert.Equal(t, gotag.TAG_VALUE_TYPE_UINT64, int(dataType))
 	assert.Equal(t, value.GetUint(), retValue.GetUint())
 }
 
