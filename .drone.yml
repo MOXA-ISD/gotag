@@ -11,7 +11,7 @@ steps:
   image: golang:1.12-stretch
   commands:
   - apt-get update && apt-get install -y -f ./third_party/thanos/*.deb
-  - go test -tags THANOS_GOTAG -v -cover=true -count=1 .
+  - go test -tags thanos -v -cover=true -count=1 .
   when:
     event:
       exclude:

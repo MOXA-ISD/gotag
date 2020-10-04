@@ -1,4 +1,4 @@
-// +build THANOS_GOTAG
+// +build thanos
 
 package gotag
 
