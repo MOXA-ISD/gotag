@@ -33,7 +33,7 @@ func Test_GoTag_Create(t *testing.T) {
 	defer _tag.Delete()
 }
 
-/* BOOLEAN */
+// Test_GoTag_Publish_Boolean ...
 func Test_GoTag_Publish_Boolean(t *testing.T) {
 	var (
 		module string = "moxa-dx"
@@ -64,7 +64,69 @@ func Test_GoTag_Publish_Boolean(t *testing.T) {
 	assert.Equal(t, value.GetInt(), retValue.GetInt())
 }
 
-/* INT */
+// Test_GoTag_Publish_Int16 ...
+func Test_GoTag_Publish_Int16(t *testing.T) {
+	var (
+		module string = "moxa-dx"
+		source string = "gotag"
+		tag    string = "test"
+		ts     uint64 = uint64(gotag.GetTimestamp())
+		dType  uint16 = gotag.TAG_VALUE_TYPE_INT16
+	)
+
+	_tag, err := gotag.NewClient()
+	if err != nil {
+		assert.Fail(t, "Testing Publish Failed")
+	}
+	defer _tag.Delete()
+
+	_tag.SubscribeCallback(Handler)
+	_tag.Subscribe(module, source, tag)
+
+	var uTest int16 = -160
+	value := gotag.NewValue(uTest)
+	_tag.Publish(module, source, tag, value, dType, ts)
+	time.Sleep(1 * time.Second)
+
+	assert.Equal(t, sourceName, source)
+	assert.Equal(t, tagName, tag)
+	assert.Equal(t, timestamp, ts)
+	assert.Equal(t, dataType, dType)
+	assert.Equal(t, value.GetInt(), retValue.GetInt())
+}
+
+// Test_GoTag_Publish_Int32 ...
+func Test_GoTag_Publish_Int32(t *testing.T) {
+	var (
+		module string = "moxa-dx"
+		source string = "gotag"
+		tag    string = "test"
+		ts     uint64 = uint64(gotag.GetTimestamp())
+		dType  uint16 = gotag.TAG_VALUE_TYPE_INT32
+	)
+
+	_tag, err := gotag.NewClient()
+	if err != nil {
+		assert.Fail(t, "Testing Publish Failed")
+	}
+	defer _tag.Delete()
+
+	_tag.SubscribeCallback(Handler)
+	_tag.Subscribe(module, source, tag)
+
+	var uTest int32 = -160
+	value := gotag.NewValue(uTest)
+	_tag.Publish(module, source, tag, value, dType, ts)
+	time.Sleep(1 * time.Second)
+
+	assert.Equal(t, sourceName, source)
+	assert.Equal(t, tagName, tag)
+	assert.Equal(t, timestamp, ts)
+	assert.Equal(t, dataType, dType)
+	assert.Equal(t, value.GetInt(), retValue.GetInt())
+}
+
+// Test_GoTag_Publish_Int ...
 func Test_GoTag_Publish_Int(t *testing.T) {
 	var (
 		module string = "moxa-dx"
@@ -95,7 +157,7 @@ func Test_GoTag_Publish_Int(t *testing.T) {
 	assert.Equal(t, value.GetInt(), retValue.GetInt())
 }
 
-/* UINT */
+// Test_GoTag_Publish_Uint ...
 func Test_GoTag_Publish_Uint(t *testing.T) {
 	var (
 		module string = "moxa-dx"
@@ -126,7 +188,7 @@ func Test_GoTag_Publish_Uint(t *testing.T) {
 	assert.Equal(t, value.GetUint(), retValue.GetUint())
 }
 
-/* Float */
+// Test_GoTag_Publish_Float ...
 func Test_GoTag_Publish_Float(t *testing.T) {
 	var (
 		module string = "moxa-dx"
@@ -157,7 +219,7 @@ func Test_GoTag_Publish_Float(t *testing.T) {
 	assert.Equal(t, value.GetFloat(), retValue.GetFloat())
 }
 
-/* String */
+// Test_GoTag_Publish_String ...
 func Test_GoTag_Publish_String(t *testing.T) {
 	var (
 		module string = "moxa-dx"
@@ -188,7 +250,7 @@ func Test_GoTag_Publish_String(t *testing.T) {
 	assert.Equal(t, value.GetStr(), retValue.GetStr())
 }
 
-/* Bytes */
+// Test_GoTag_Publish_Bytes ...
 func Test_GoTag_Publish_Bytes(t *testing.T) {
 	var (
 		module string = "moxa-dx"
@@ -219,7 +281,7 @@ func Test_GoTag_Publish_Bytes(t *testing.T) {
 	assert.Equal(t, value.GetBytes(), retValue.GetBytes())
 }
 
-/* Double */
+// Test_GoTag_Publish_Double ...
 func Test_GoTag_Publish_Double(t *testing.T) {
 	var (
 		module string = "moxa-dx"
