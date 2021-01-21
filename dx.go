@@ -16,18 +16,37 @@ void dx_tag_proxy_callback(DX_TAG_OBJ* dx_data_obj, uint16_t obj_cnt, void* user
 }
 
 void to_int_value(int64_t *i, DX_TAG_VALUE *val, uint16_t _size, int to_dx) {
-	if (to_dx)
-		val->i = *i;
+	if (to_dx) {
+		switch (_size) {
+		case DX_TAG_VALUE_TYPE_INT8:
+			val->i8 = (int8_t)*i;
+			break;
+		case DX_TAG_VALUE_TYPE_INT16:
+			val->i16 = (int16_t)*i;
+			break;
+		case DX_TAG_VALUE_TYPE_INT32:
+			val->i32 = (int32_t)*i;
+			break;
+		case DX_TAG_VALUE_TYPE_INT64:
+			val->i64 = (int64_t)*i;
+			break;
+		default:
+			val->i = *i;
+		}
+	}
 	else {
 		switch (_size) {
 		case DX_TAG_VALUE_TYPE_INT8:
-			*i = val->i8;
+			*i = (int64_t)val->i8;
 			break;
 		case DX_TAG_VALUE_TYPE_INT16:
-			*i = val->i16;
+			*i = (int64_t)val->i16;
 			break;
 		case DX_TAG_VALUE_TYPE_INT32:
-			*i = val->i32;
+			*i = (int64_t)val->i32;
+			break;
+		case DX_TAG_VALUE_TYPE_INT64:
+			*i = (int64_t)val->i64;
 			break;
 		default:
 			*i = val->i;
@@ -35,11 +54,43 @@ void to_int_value(int64_t *i, DX_TAG_VALUE *val, uint16_t _size, int to_dx) {
 	}
 }
 
-void to_uint_value(uint64_t *u, DX_TAG_VALUE *val, int to_dx) {
-	if (to_dx)
-		val->u = *u;
-	else
-		*u = val->u;
+void to_uint_value(uint64_t *u, DX_TAG_VALUE *val, uint16_t _size, int to_dx) {
+	if (to_dx) {
+		switch (_size) {
+		case DX_TAG_VALUE_TYPE_UINT8:
+			val->u8 = (uint8_t)*u;
+			break;
+		case DX_TAG_VALUE_TYPE_UINT16:
+			val->u16 = (uint16_t)*u;
+			break;
+		case DX_TAG_VALUE_TYPE_UINT32:
+			val->u32 = (uint32_t)*u;
+			break;
+		case DX_TAG_VALUE_TYPE_UINT64:
+			val->u64 = (uint64_t)*u;
+			break;
+		default:
+			val->u = *u;
+		}
+	}
+	else {
+		switch (_size) {
+		case DX_TAG_VALUE_TYPE_UINT8:
+			*u = (uint64_t)val->i8;
+			break;
+		case DX_TAG_VALUE_TYPE_UINT16:
+			*u = (uint64_t)val->u16;
+			break;
+		case DX_TAG_VALUE_TYPE_UINT32:
+			*u = (uint64_t)val->u32;
+			break;
+		case DX_TAG_VALUE_TYPE_UINT64:
+			*u = (uint64_t)val->u64;
+			break;
+		default:
+			*u = val->u;
+		}
+	}
 }
 
 void to_float_value(float *f, DX_TAG_VALUE *val, int to_dx) {
@@ -145,10 +196,10 @@ func EncodeDxValue(val *Value, v *C.DX_TAG_VALUE, valType uint16) {
 		fallthrough
 	case C.DX_TAG_VALUE_TYPE_INT, C.DX_TAG_VALUE_TYPE_INT8, C.DX_TAG_VALUE_TYPE_INT16,
 		C.DX_TAG_VALUE_TYPE_INT32, C.DX_TAG_VALUE_TYPE_INT64:
-		C.to_int_value((*C.int64_t)(unsafe.Pointer(&val.i)), v, 0, 1)
+		C.to_int_value((*C.int64_t)(unsafe.Pointer(&val.i)), v, C.uint16_t(valType), 1)
 	case C.DX_TAG_VALUE_TYPE_UINT, C.DX_TAG_VALUE_TYPE_UINT8, C.DX_TAG_VALUE_TYPE_UINT16,
 		C.DX_TAG_VALUE_TYPE_UINT32, C.DX_TAG_VALUE_TYPE_UINT64:
-		C.to_uint_value((*C.uint64_t)(unsafe.Pointer(&val.u)), v, 1)
+		C.to_uint_value((*C.uint64_t)(unsafe.Pointer(&val.u)), v, C.uint16_t(valType), 1)
 	case C.DX_TAG_VALUE_TYPE_FLOAT:
 		C.to_float_value((*C.float)(unsafe.Pointer(&val.f)), v, 1)
 	case C.DX_TAG_VALUE_TYPE_DOUBLE:
@@ -177,7 +228,7 @@ func DecodeDxValue(val *Value, v *C.DX_TAG_VALUE, valType uint16) {
 		C.to_int_value((*C.int64_t)(unsafe.Pointer(&val.i)), v, C.uint16_t(valType), 0)
 	case C.DX_TAG_VALUE_TYPE_UINT, C.DX_TAG_VALUE_TYPE_UINT8, C.DX_TAG_VALUE_TYPE_UINT16,
 		C.DX_TAG_VALUE_TYPE_UINT32, C.DX_TAG_VALUE_TYPE_UINT64:
-		C.to_uint_value((*C.uint64_t)(unsafe.Pointer(&val.u)), v, 0)
+		C.to_uint_value((*C.uint64_t)(unsafe.Pointer(&val.u)), v, C.uint16_t(valType), 0)
 	case C.DX_TAG_VALUE_TYPE_FLOAT:
 		C.to_float_value((*C.float)(unsafe.Pointer(&val.f)), v, 0)
 	case C.DX_TAG_VALUE_TYPE_DOUBLE:

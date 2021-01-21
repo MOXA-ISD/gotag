@@ -41,6 +41,13 @@ type Value struct {
 	rp []byte
 }
 
+func (m *Value) GetBool() bool {
+	if m != nil && m.i != 0 {
+		return true
+	}
+	return false
+}
+
 func (m *Value) GetFloat() float32 {
 	if m != nil {
 		return m.f
@@ -92,6 +99,11 @@ func (m *Value) GetRaw() []byte {
 
 func NewValue(value interface{}) *Value {
 	switch reflect.TypeOf(value).Kind() {
+	case reflect.Bool:
+		if value.(bool) {
+			return &Value{i: 1}
+		}
+		return &Value{i: 0}
 	case reflect.Int:
 		return &Value{i: int64(value.(int))}
 	case reflect.Int8:
