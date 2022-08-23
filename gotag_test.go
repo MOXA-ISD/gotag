@@ -1,20 +1,21 @@
 package gotag_test
 
 import (
-	"time"
 	"testing"
+	"time"
+
 	"github.com/stretchr/testify/assert"
 
 	gotag "github.com/MOXA-ISD/gotag"
 )
 
 var (
-	moduleName	string
-	sourceName	string
-	tagName		string
-	timestamp	uint64
-	dataType	uint16
-	retValue	*gotag.Value
+	moduleName string
+	sourceName string
+	tagName    string
+	timestamp  uint64
+	dataType   uint16
+	retValue   *gotag.Value
 )
 
 func Handler(module string, source string, tag string, val *gotag.Value, valtype uint16, ts uint64) {
@@ -32,19 +33,19 @@ func Test_GoTag_Create(t *testing.T) {
 	defer _tag.Delete()
 }
 
-/* BOOLEAN */
+// Test_GoTag_Publish_Boolean ...
 func Test_GoTag_Publish_Boolean(t *testing.T) {
 	var (
 		module string = "moxa-dx"
 		source string = "gotag"
-		tag string = "test"
-		ts uint64 = 1563760922000
-		dType uint16 = gotag.TAG_VALUE_TYPE_BOOLEAN
+		tag    string = "test"
+		ts     uint64 = uint64(gotag.GetTimestamp())
+		dType  uint16 = gotag.TAG_VALUE_TYPE_BOOLEAN
 	)
 
 	_tag, err := gotag.NewClient()
 	if err != nil {
-	   assert.Fail(t, "Testing Publish Failed")
+		assert.Fail(t, "Testing Publish Failed")
 	}
 	defer _tag.Delete()
 
@@ -63,19 +64,81 @@ func Test_GoTag_Publish_Boolean(t *testing.T) {
 	assert.Equal(t, value.GetInt(), retValue.GetInt())
 }
 
-/* INT */
-func Test_GoTag_Publish_Int(t *testing.T) {
+// Test_GoTag_Publish_Int16 ...
+func Test_GoTag_Publish_Int16(t *testing.T) {
 	var (
 		module string = "moxa-dx"
 		source string = "gotag"
-		tag string = "test"
-		ts uint64 = 1563760922000
-		dType uint16 = gotag.TAG_VALUE_TYPE_INT
+		tag    string = "test"
+		ts     uint64 = uint64(gotag.GetTimestamp())
+		dType  uint16 = gotag.TAG_VALUE_TYPE_INT16
 	)
 
 	_tag, err := gotag.NewClient()
 	if err != nil {
-	   assert.Fail(t, "Testing Publish Failed")
+		assert.Fail(t, "Testing Publish Failed")
+	}
+	defer _tag.Delete()
+
+	_tag.SubscribeCallback(Handler)
+	_tag.Subscribe(module, source, tag)
+
+	var uTest int16 = -160
+	value := gotag.NewValue(uTest)
+	_tag.Publish(module, source, tag, value, dType, ts)
+	time.Sleep(1 * time.Second)
+
+	assert.Equal(t, sourceName, source)
+	assert.Equal(t, tagName, tag)
+	assert.Equal(t, timestamp, ts)
+	assert.Equal(t, dataType, dType)
+	assert.Equal(t, value.GetInt(), retValue.GetInt())
+}
+
+// Test_GoTag_Publish_Int32 ...
+func Test_GoTag_Publish_Int32(t *testing.T) {
+	var (
+		module string = "moxa-dx"
+		source string = "gotag"
+		tag    string = "test"
+		ts     uint64 = uint64(gotag.GetTimestamp())
+		dType  uint16 = gotag.TAG_VALUE_TYPE_INT32
+	)
+
+	_tag, err := gotag.NewClient()
+	if err != nil {
+		assert.Fail(t, "Testing Publish Failed")
+	}
+	defer _tag.Delete()
+
+	_tag.SubscribeCallback(Handler)
+	_tag.Subscribe(module, source, tag)
+
+	var uTest int32 = -160
+	value := gotag.NewValue(uTest)
+	_tag.Publish(module, source, tag, value, dType, ts)
+	time.Sleep(1 * time.Second)
+
+	assert.Equal(t, sourceName, source)
+	assert.Equal(t, tagName, tag)
+	assert.Equal(t, timestamp, ts)
+	assert.Equal(t, dataType, dType)
+	assert.Equal(t, value.GetInt(), retValue.GetInt())
+}
+
+// Test_GoTag_Publish_Int ...
+func Test_GoTag_Publish_Int(t *testing.T) {
+	var (
+		module string = "moxa-dx"
+		source string = "gotag"
+		tag    string = "test"
+		ts     uint64 = uint64(uint64(gotag.GetTimestamp()))
+		dType  uint16 = gotag.TAG_VALUE_TYPE_INT
+	)
+
+	_tag, err := gotag.NewClient()
+	if err != nil {
+		assert.Fail(t, "Testing Publish Failed")
 	}
 	defer _tag.Delete()
 
@@ -94,19 +157,19 @@ func Test_GoTag_Publish_Int(t *testing.T) {
 	assert.Equal(t, value.GetInt(), retValue.GetInt())
 }
 
-/* UINT */
+// Test_GoTag_Publish_Uint ...
 func Test_GoTag_Publish_Uint(t *testing.T) {
 	var (
 		module string = "moxa-dx"
 		source string = "gotag"
-		tag string = "test"
-		ts uint64 = 1563760922000
-		dType uint16 = gotag.TAG_VALUE_TYPE_UINT
+		tag    string = "test"
+		ts     uint64 = uint64(gotag.GetTimestamp())
+		dType  uint16 = gotag.TAG_VALUE_TYPE_UINT
 	)
 
 	_tag, err := gotag.NewClient()
 	if err != nil {
-	   assert.Fail(t, "Testing Publish Failed")
+		assert.Fail(t, "Testing Publish Failed")
 	}
 	defer _tag.Delete()
 
@@ -125,20 +188,19 @@ func Test_GoTag_Publish_Uint(t *testing.T) {
 	assert.Equal(t, value.GetUint(), retValue.GetUint())
 }
 
-
-/* Float */
+// Test_GoTag_Publish_Float ...
 func Test_GoTag_Publish_Float(t *testing.T) {
 	var (
 		module string = "moxa-dx"
 		source string = "gotag"
-		tag string = "test"
-		ts uint64 = 1563760922000
-		dType uint16 = gotag.TAG_VALUE_TYPE_FLOAT
+		tag    string = "test"
+		ts     uint64 = uint64(uint64(gotag.GetTimestamp()))
+		dType  uint16 = gotag.TAG_VALUE_TYPE_FLOAT
 	)
 
 	_tag, err := gotag.NewClient()
 	if err != nil {
-	   assert.Fail(t, "Testing Publish Failed")
+		assert.Fail(t, "Testing Publish Failed")
 	}
 	defer _tag.Delete()
 
@@ -157,19 +219,19 @@ func Test_GoTag_Publish_Float(t *testing.T) {
 	assert.Equal(t, value.GetFloat(), retValue.GetFloat())
 }
 
-/* String */
+// Test_GoTag_Publish_String ...
 func Test_GoTag_Publish_String(t *testing.T) {
 	var (
 		module string = "moxa-dx"
 		source string = "gotag"
-		tag string = "test"
-		ts uint64 = 1563760922000
-		dType uint16 = gotag.TAG_VALUE_TYPE_STRING
+		tag    string = "test"
+		ts     uint64 = 1563760922000
+		dType  uint16 = gotag.TAG_VALUE_TYPE_STRING
 	)
 
 	_tag, err := gotag.NewClient()
 	if err != nil {
-	   assert.Fail(t, "Testing Publish Failed")
+		assert.Fail(t, "Testing Publish Failed")
 	}
 	defer _tag.Delete()
 
@@ -188,19 +250,19 @@ func Test_GoTag_Publish_String(t *testing.T) {
 	assert.Equal(t, value.GetStr(), retValue.GetStr())
 }
 
-/* Bytes */
+// Test_GoTag_Publish_Bytes ...
 func Test_GoTag_Publish_Bytes(t *testing.T) {
 	var (
 		module string = "moxa-dx"
 		source string = "gotag"
-		tag string = "test"
-		ts uint64 = 1563760922000
-		dType uint16 = gotag.TAG_VALUE_TYPE_BYTEARRAY
+		tag    string = "test"
+		ts     uint64 = uint64(uint64(gotag.GetTimestamp()))
+		dType  uint16 = gotag.TAG_VALUE_TYPE_BYTEARRAY
 	)
 
 	_tag, err := gotag.NewClient()
 	if err != nil {
-	   assert.Fail(t, "Testing Publish Failed")
+		assert.Fail(t, "Testing Publish Failed")
 	}
 	defer _tag.Delete()
 
@@ -219,19 +281,19 @@ func Test_GoTag_Publish_Bytes(t *testing.T) {
 	assert.Equal(t, value.GetBytes(), retValue.GetBytes())
 }
 
-/* Double */
+// Test_GoTag_Publish_Double ...
 func Test_GoTag_Publish_Double(t *testing.T) {
 	var (
 		module string = "moxa-dx"
 		source string = "gotag"
-		tag string = "test"
-		ts uint64 = 1563760922000
-		dType uint16 = gotag.TAG_VALUE_TYPE_DOUBLE
+		tag    string = "test"
+		ts     uint64 = uint64(uint64(gotag.GetTimestamp()))
+		dType  uint16 = gotag.TAG_VALUE_TYPE_DOUBLE
 	)
 
 	_tag, err := gotag.NewClient()
 	if err != nil {
-	   assert.Fail(t, "Testing Publish Failed")
+		assert.Fail(t, "Testing Publish Failed")
 	}
 	defer _tag.Delete()
 
