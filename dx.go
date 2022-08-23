@@ -76,7 +76,7 @@ void to_uint_value(uint64_t *u, DX_TAG_VALUE *val, uint16_t _size, int to_dx) {
 	else {
 		switch (_size) {
 		case DX_TAG_VALUE_TYPE_UINT8:
-			*u = (uint64_t)val->i8;
+			*u = (uint64_t)val->u8;
 			break;
 		case DX_TAG_VALUE_TYPE_UINT16:
 			*u = (uint64_t)val->u16;
